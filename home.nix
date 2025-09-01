@@ -1,10 +1,18 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
+
+let
+  sshKey = "${builtins.getEnv "HOME"}/.ssh/id_ed25519.pub";
+in
 
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "vandy";
   home.homeDirectory = "/home/vandy";
+
+  nixpkgs.config = {
+    allowUnfree = true;
+  };
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -20,7 +28,7 @@
   home.packages = [
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
-    # pkgs.hello
+    pkgs.hello
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
@@ -35,6 +43,45 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
   ];
+
+  programs.git = {
+    enable = true;
+    userName = "vandyG";
+    userEmail = "vandy.goel23@gmail.com";
+  };
+
+  programs.git.extraConfig = lib.optionalAttrs (builtins.pathExists sshKey) {
+    gpg.format = "ssh";
+    user.signingKey = sshKey;
+  };
+
+  programs.fish = {
+    enable = true;
+  };
+
+  programs.bash.enable = true;
+
+  programs.bash.initExtra = ''
+    # If not running interactively, don't do anything
+    if [[ $- != *i* ]]; then
+        return
+    fi
+
+    if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then
+      . ~/.nix-profile/etc/profile.d/nix.sh
+    fi
+
+    # If we are not already in fish, start it
+    # The check for FISH_VERSION prevents a loop if fish ever starts a bash shell
+    if command -v fish >/dev/null 2>&1; then
+      exec fish
+    fi
+
+  '';
+
+  programs.rclone = {
+    enable = true;
+  };
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -69,8 +116,13 @@
   #
   home.sessionVariables = {
     # EDITOR = "emacs";
+    SHELL = "fish";
   };
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
+
+  imports = [
+    ./starship.nix
+  ];
 }
