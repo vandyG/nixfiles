@@ -29,6 +29,7 @@ in
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     pkgs.hello
+    pkgs.unzip
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
@@ -53,6 +54,7 @@ in
   programs.git.extraConfig = lib.optionalAttrs (builtins.pathExists sshKey) {
     gpg.format = "ssh";
     user.signingKey = sshKey;
+    commit.gpgsign = true;
   };
 
   programs.fish = {
