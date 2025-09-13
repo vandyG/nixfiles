@@ -27,14 +27,14 @@ journalctl --user -u rclone-Resume.service -f
 
 This will show why the mount failed (bad remote name, FUSE error, permission issues, etc.).
 
-#### Common errors
+### Common errors
 
 - Rclone remote not configured.
 - fusermount3 error: "option allow_other only allowed if 'user_allow_other' is set in /etc/fuse.conf".
 
 ---
 
-#### Solutions
+### Solutions
 
 ##### Enable `allow_other` globally
 
