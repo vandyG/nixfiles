@@ -32,7 +32,6 @@ in
 
   imports = [
     ./starship.nix
-    ./modules/packages.nix
     ./modules/shells.nix
     ./modules/rclone.nix
     ./modules/git.nix
