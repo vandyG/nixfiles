@@ -17,6 +17,7 @@ in
   home.packages = [
     pkgs.unzip
     pkgs.fuse3
+    pkgs.zoxide
   ];
 
   home.file = {

@@ -6,6 +6,14 @@
     shellInit = ''
       eval (direnv hook fish)
     '';
+
+    # Run after other shell init code (ensure zoxide is initialized last)
+    shellInitLast = ''
+      # Initialize zoxide (jumping utility) for fish
+      zoxide init fish | source
+
+      abbr -a z zoxide
+    '';
   };
 
   programs.bash = {
@@ -23,7 +31,7 @@
       # If we are not already in fish, start it
       # The check for FISH_VERSION prevents a loop if fish ever starts a bash shell
       if command -v fish >/dev/null 2>&1; then
-        exec fish
+        exec fish -i
       fi
 
     '';

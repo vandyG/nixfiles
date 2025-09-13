@@ -36,7 +36,7 @@ This will show why the mount failed (bad remote name, FUSE error, permission iss
 
 ### Solutions
 
-##### Enable `allow_other` globally
+#### Enable `allow_other` globally
 
 1. Edit the FUSE config as root:
 
