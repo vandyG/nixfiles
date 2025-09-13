@@ -30,6 +30,7 @@ in
     # # "Hello, world!" when run.
     pkgs.hello
     pkgs.unzip
+    pkgs.fuse3
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
@@ -128,6 +129,29 @@ in
   home.sessionVariables = {
     # EDITOR = "emacs";
     SHELL = "fish";
+  };
+
+  systemd.user.services.rclone-Resume = {
+    Unit = {
+      Description = "Rclone mount for Resume";
+      After = [ "network-online.target" ];
+      Wants = [ "network-online.target" ];
+    };
+
+    Service = {
+      Type = "simple";
+      ExecStart = ''
+        ${pkgs.rclone}/bin/rclone mount vandy23:Resume/ %h/data/Resume \
+          --vfs-cache-mode writes \
+          --allow-other
+      '';
+      ExecStop = "${pkgs.fuse3}/bin/fusermount3 -u %h/data/Resume";
+      Restart = "always";
+    };
+
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
   };
 
   # Let Home Manager install and manage itself.
