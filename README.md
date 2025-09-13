@@ -1,4 +1,4 @@
-nixfiles — personal NixOS / Home Manager configuration
+# nixfiles — personal NixOS / Home Manager configuration
 
 This repository contains the Nix configuration used to provision my user environment via Home Manager and related Nix modules.
 
