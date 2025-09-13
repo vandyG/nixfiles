@@ -59,6 +59,9 @@ in
 
   programs.fish = {
     enable = true;
+    shellInit = ''
+      eval (direnv hook fish)
+    '';
   };
 
   programs.bash.enable = true;
@@ -83,6 +86,12 @@ in
 
   programs.rclone = {
     enable = true;
+  };
+
+  programs.direnv = {
+    enable = true;
+    enableBashIntegration = true; # see note on other shells below
+    nix-direnv.enable = true;
   };
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
