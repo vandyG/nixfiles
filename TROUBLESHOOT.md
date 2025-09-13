@@ -1,43 +1,60 @@
-# Troubleshoot Rclone Mount
+# Troubleshooting
 
-## 🔍 1. Check if service is running
+Table of contents
+
+- [rclone mount](#rclone-mount)
+
+## rclone mount
+
+Short guide to diagnose and fix a failing rclone mount service (user unit: `rclone-Resume.service`).
+
+### 1. Check if the service is running
 
 ```bash
 systemctl --user status rclone-Resume.service
 ```
 
-* If it says **active (running)** → mount should be there.
-* If it says **failed** → there’s probably an error (wrong path, missing `user_allow_other`, etc.).
+- If it says **active (running)** → the mount should be present.
+- If it says **failed** → there’s probably an error (wrong path, missing `user_allow_other`, bad remote name, etc.).
 
 ---
 
-## 🔍 2. Look at logs
+### 2. Inspect the logs
 
 ```bash
 journalctl --user -u rclone-Resume.service -f
 ```
 
-This shows exactly why the mount failed (bad remote name, fuse issue, etc.).
+This will show why the mount failed (bad remote name, FUSE error, permission issues, etc.).
 
-## Common Errors encountered
+#### Common errors
 
-- Rclone remote not setup.
-- mount helper error: fusermount3: option allow_other only allowed if 'user_allow_other' is set in /etc/fuse.conf (see solution below)
+- Rclone remote not configured.
+- fusermount3 error: "option allow_other only allowed if 'user_allow_other' is set in /etc/fuse.conf".
 
 ---
-## Solutions
 
-### Enable `allow_other` globally
+#### Solutions
 
-1. Edit FUSE config:
+##### Enable `allow_other` globally
 
-   ```bash
-   sudo nano /etc/fuse.conf
-   ```
-2. Uncomment or add:
+1. Edit the FUSE config as root:
 
-   ```
-   user_allow_other
-   ```
-3. Save + exit, then restart WSL (`wsl --shutdown` from Windows side or just reboot).
+```bash
+sudo nano /etc/fuse.conf
+```
+
+2. Uncomment or add the following line:
+
+```text
+user_allow_other
+```
+
+3. Save and exit. Then reboot or restart WSL (if applicable):
+
+```bash
+#windows: wsl --shutdown (from Windows side)
+# otherwise, reboot the system
+```
+
 ---
