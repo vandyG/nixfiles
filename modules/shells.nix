@@ -11,8 +11,11 @@
     shellInitLast = ''
       # Initialize zoxide (jumping utility) for fish
       zoxide init fish | source
-
-      abbr -a z zoxide
+  abbr -a gs 'git status'
+  # PowerToys workspace launchers: prefix with `ptw-` for PowerToys Workspace
+  # Standardized nomenclature: ptw-<short-name>
+  # Example: `ptw-jobs` launches the Job Applications PowerToys workspace
+  abbr -a ptw-jobs 'powershell.exe -Command "Invoke-Item \"C:\\Users\\vandy\\OneDrive\\Desktop\\Job Applications.lnk\""'
     '';
   };
 
