@@ -18,6 +18,7 @@ in
     pkgs.unzip
     pkgs.fuse3
     pkgs.zoxide
+    pkgs.fzf
   ];
 
   home.file = {
