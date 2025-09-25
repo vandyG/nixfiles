@@ -16,6 +16,7 @@
   # Standardized nomenclature: ptw-<short-name>
   # Example: `ptw-jobs` launches the Job Applications PowerToys workspace
   abbr -a ptw-jobs 'powershell.exe -Command "Invoke-Item \"C:\\Users\\vandy\\OneDrive\\Desktop\\Job Applications.lnk\""'
+  abbr -a ptw-work 'powershell.exe -Command "Invoke-Item \"C:\\Users\\vandy\\OneDrive\\Desktop\\Work.lnk\""'
     '';
   };
 
