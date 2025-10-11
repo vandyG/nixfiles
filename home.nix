@@ -33,7 +33,7 @@ in
   programs.home-manager.enable = true;
 
   imports = [
-    ./starship.nix
+    ./modules/starship.nix
     ./modules/shells.nix
     ./modules/rclone.nix
     ./modules/git.nix
