@@ -7,6 +7,7 @@ in
 {
   home.username = "vandy";
   home.homeDirectory = "/home/vandy";
+  programs.home-manager.enable = true;
 
   nixpkgs.config = {
     allowUnfree = true;
@@ -23,33 +24,16 @@ in
     pkgs.gh
   ];
 
-  home.file = {
-    ".config/alacritty.toml" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.config/home-manager/modules/alacritty.toml";
-    };
-  };
-
   home.sessionVariables = {
     EDITOR = "code";
     SHELL = "fish";
   };
-
-  programs.home-manager.enable = true;
 
   imports = [
     ./modules/starship.nix
     ./modules/shells.nix
     ./modules/rclone.nix
     ./modules/git.nix
-    # ./modules/flatpak.nix
+    ./modules/alacritty.nix
   ];
-
-  /* 
-    flatpak = {
-      enable = true;
-      apps = [
-        "com.stremio.Stremio"
-      ];
-    };
-  */
 }
