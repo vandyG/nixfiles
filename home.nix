@@ -19,10 +19,14 @@ in
     pkgs.fuse3
     pkgs.zoxide
     pkgs.uv
+    pkgs.nerd-fonts.jetbrains-mono
+    pkgs.gh
   ];
 
   home.file = {
-
+    ".config/alacritty.toml" = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.config/home-manager/modules/alacritty.toml";
+    };
   };
 
   home.sessionVariables = {
@@ -37,5 +41,15 @@ in
     ./modules/shells.nix
     ./modules/rclone.nix
     ./modules/git.nix
+    # ./modules/flatpak.nix
   ];
+
+  /* 
+    flatpak = {
+      enable = true;
+      apps = [
+        "com.stremio.Stremio"
+      ];
+    };
+  */
 }
