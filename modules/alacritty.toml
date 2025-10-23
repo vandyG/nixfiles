@@ -37,7 +37,7 @@ bold_italic = { family = "JetBrainsMono NF", style = "Bold Italic" }
 # Window settings
 [window]
 dimensions = { columns = 120, lines = 30 }
-decorations = "none"
+decorations = "Full"
 padding = { x = 10, y = 10 }
 dynamic_padding = true
 blur = true
