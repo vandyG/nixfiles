@@ -7,6 +7,7 @@ in
 {
   home.username = "vandy";
   home.homeDirectory = "/home/vandy";
+  programs.home-manager.enable = true;
 
   nixpkgs.config = {
     allowUnfree = true;
@@ -21,35 +22,21 @@ in
     pkgs.uv
     pkgs.nerd-fonts.jetbrains-mono
     pkgs.gh
+    pkgs.gtk-engine-murrine
+    pkgs.sassc 
+    pkgs.gnome-themes-extra
   ];
-
-  home.file = {
-    ".config/alacritty.toml" = {
-      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.config/home-manager/modules/alacritty.toml";
-    };
-  };
 
   home.sessionVariables = {
     EDITOR = "code";
     SHELL = "fish";
   };
 
-  programs.home-manager.enable = true;
-
   imports = [
     ./modules/starship.nix
     ./modules/shells.nix
     ./modules/rclone.nix
     ./modules/git.nix
-    # ./modules/flatpak.nix
+    ./modules/templates.nix
   ];
-
-  /* 
-    flatpak = {
-      enable = true;
-      apps = [
-        "com.stremio.Stremio"
-      ];
-    };
-  */
 }

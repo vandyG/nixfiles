@@ -5,6 +5,7 @@ This repository contains the Nix configuration used to provision my user environ
 Key notes
 - Rclone setup assumes I have set up a Google Drive remote.
 - Rclone config is not managed by Home Manager and must be configured separately (typically at ~/.config/rclone/rclone.conf).
+- A reusable `mk-direnv-shell` helper is included; it scaffolds `.envrc` and `shell.nix` files from templates so you can quickly enable `direnv` + `nix` in any project directory.
 
 Repository layout
 - `home.nix` — main Home Manager configuration entrypoint used to build and apply the user profile.
@@ -13,6 +14,8 @@ Repository layout
 	- `git.nix` — Git-related settings and helpers.
 	- `rclone.nix` — Rclone-related helpers and service definitions.
 	- `shells.nix` — shell configuration (fish, bash, etc.) and environment settings.
+	- `templates.nix` — packages reusable project templates and exposes helper commands (e.g., `mk-direnv-shell`).
+- `modules/templates/direnv-shell/` — source templates used by `mk-direnv-shell` to create `.envrc` and `shell.nix` files.
 
 Prerequisites
 - Nix installed on the system (https://nixos.org/download.html).
@@ -25,7 +28,9 @@ How to use
 
 	 - Enable and run Home Manager as documented in the Home Manager manual.
 
-3. Keep secrets and external configs (like `rclone.conf`) out of this repo.
+3. After applying, run `mk-direnv-shell [--force]` inside any directory to drop in a ready-to-use `.envrc` and `shell.nix` that pins Python 3.13 and exports a compatible `LD_LIBRARY_PATH`.
+
+4. Keep secrets and external configs (like `rclone.conf`) out of this repo.
 
 Notes and troubleshooting
 - See `TROUBLESHOOT.md` for common issues when applying this configuration.
