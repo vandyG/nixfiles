@@ -22,9 +22,6 @@ in
     pkgs.uv
     pkgs.nerd-fonts.jetbrains-mono
     pkgs.gh
-    pkgs.gtk-engine-murrine
-    pkgs.sassc 
-    pkgs.gnome-themes-extra
   ];
 
   home.sessionVariables = {
