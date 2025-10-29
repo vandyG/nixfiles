@@ -2,19 +2,29 @@
 
 let
   sshKey = "${builtins.getEnv "HOME"}/.ssh/id_ed25519.pub";
+  sshKeyExists = builtins.pathExists sshKey;
 in
 
 {
   programs.git = {
     enable = true;
-    userName = "vandyG";
-    userEmail = "vandy.goel23@gmail.com";
+    settings = lib.recursiveUpdate
+      {
+        user = {
+          name = "vandyG";
+          email = "vandy.goel23@gmail.com";
+        };
+      }
+      (lib.optionalAttrs sshKeyExists {
+        gpg = {
+          format = "ssh";
+        };
+        user = {
+          signingKey = sshKey;
+        };
+        commit = {
+          gpgsign = true;
+        };
+      });
   };
-
-  programs.git.extraConfig = lib.optionalAttrs (builtins.pathExists sshKey) {
-    gpg.format = "ssh";
-    user.signingKey = sshKey;
-    commit.gpgsign = true;
-  };
-
 }
