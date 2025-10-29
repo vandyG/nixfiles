@@ -38,5 +38,6 @@ in
     ./modules/rclone.nix
     ./modules/git.nix
     ./modules/templates.nix
+    ./modules/alacritty.nix
   ];
 }
