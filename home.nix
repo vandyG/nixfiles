@@ -32,7 +32,7 @@ in
   imports = [
     ./modules/starship.nix
     ./modules/shells.nix
-    ./modules/rclone.nix
+    #  ./modules/rclone.nix
     ./modules/git.nix
     ./modules/templates.nix
   ];
