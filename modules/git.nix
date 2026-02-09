@@ -11,8 +11,8 @@ in
     settings = lib.recursiveUpdate
       {
         user = {
-          name = "vandyG";
-          email = "vandy.goel23@gmail.com";
+          name = "vgoel_isn";
+          email = "vgoel@isn.com";
         };
       }
       (lib.optionalAttrs sshKeyExists {
