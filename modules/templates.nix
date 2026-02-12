@@ -89,6 +89,7 @@ EOF
             fi
 
             cp "$src" "$dest"
+            chmod 0644 "$dest"
           }
 
           copy_template ".envrc"
@@ -131,6 +132,7 @@ EOF
           fi
 
           cp "$firefox_user_template" "$dest"
+          chmod 0644 "$dest"
           printf 'nix-vandy initff: wrote user.js in %s\n' "$profile_dir"
           ;;
         -h|--help)
@@ -148,9 +150,15 @@ in
 {
   home.packages = [ nixVandy ];
 
-  home.file.".local/share/nix-templates/${templateName}/.envrc".source =
-    ./templates/direnv-shell/.envrc;
+  home.file.".local/share/nix-templates/${templateName}/.envrc" = {
+    source = ./templates/direnv-shell/.envrc;
+  };
 
-  home.file.".local/share/nix-templates/${templateName}/shell.nix".source =
-    ./templates/direnv-shell/shell.nix;
+  home.file.".local/share/nix-templates/${templateName}/shell.nix" = {
+    source = ./templates/direnv-shell/shell.nix;
+  };
+
+  home.file.".local/share/nix-templates/firefox/user.js" = {
+    source = ./templates/user.js;
+  };
 }
