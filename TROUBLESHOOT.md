@@ -5,6 +5,7 @@ Table of contents
 - [rclone mount](#rclone-mount)
 - [git signing](#git-signing)
 - [nix-vandy helper](#nix-vandy-helper)
+- [profile selection](#profile-selection)
 
 ## rclone mount
 
@@ -145,5 +146,35 @@ git rebase --abort
 If Fish is not showing completions for `nix-vandy`, re-apply Home Manager and start a new shell session so Fish reloads the generated completion definitions.
 
 The custom Fish helper functions for `nix-vandy` intentionally avoid the `__fish_*` prefix so they do not collide with Fish's internal helper namespace.
+
+## profile selection
+
+The repo now selects platform-specific configuration through a profile instead of permanent Git branches.
+
+### Common errors
+
+- Home Manager evaluation fails because neither `NIX_VANDY_PROFILE` nor `profiles/local.nix` is set.
+- Home Manager evaluation fails because the selected profile is not one of `ubuntu`, `wsl`, or `wsl_work`.
+
+### Fixes
+
+Set the profile for one invocation:
+
+```bash
+NIX_VANDY_PROFILE=wsl_work home-manager switch -f ~/nixfiles/home.nix
+```
+
+Or create an untracked `profiles/local.nix` file in the repo so each machine keeps its own default profile:
+
+```nix
+"wsl_work"
+```
+
+The pre-migration branch state is recoverable from these local backup tags:
+
+- `backup/pre-profile-migration-master`
+- `backup/pre-profile-migration-ubuntu`
+- `backup/pre-profile-migration-wsl`
+- `backup/pre-profile-migration-wsl_work`
 
 ---

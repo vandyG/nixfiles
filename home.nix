@@ -1,7 +1,22 @@
 { config, pkgs, lib, ... }:
 
 let
-  sshKey = "${builtins.getEnv "HOME"}/.ssh/id_ed25519.pub";
+  envProfile = builtins.getEnv "NIX_VANDY_PROFILE";
+  localProfilePath = "${toString ./.}/profiles/local.nix";
+  selectedProfile =
+    if envProfile != "" then envProfile
+    else if builtins.pathExists localProfilePath then import localProfilePath
+    else throw ''
+      nixfiles: set NIX_VANDY_PROFILE or create profiles/local.nix.
+      Supported profiles: ubuntu, wsl, wsl_work
+    '';
+  profileModules = {
+    ubuntu = ./profiles/ubuntu.nix;
+    wsl = ./profiles/wsl.nix;
+    wsl_work = ./profiles/wsl_work.nix;
+  };
+  profileModule = profileModules.${selectedProfile}
+    or (throw "nixfiles: unsupported profile '${selectedProfile}'");
 in
 
 {
@@ -27,13 +42,14 @@ in
   home.sessionVariables = {
     EDITOR = "code";
     SHELL = "fish";
+    NIX_VANDY_PROFILE = selectedProfile;
   };
 
   imports = [
     ./modules/starship.nix
     ./modules/shells.nix
-    ./modules/rclone.nix
     ./modules/git.nix
     ./modules/templates.nix
+    profileModule
   ];
 }

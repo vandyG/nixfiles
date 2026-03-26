@@ -1,0 +1,5 @@
+{ ... }:
+
+{
+  imports = [ ./base-wsl.nix ];
+}
