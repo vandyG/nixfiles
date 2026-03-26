@@ -69,6 +69,38 @@ let
         fi
       }
 
+      run_repo_git_quiet() {
+        local step="$1"
+        shift
+
+        local output_file
+        output_file="$(mktemp)"
+
+        if repo_git "$@" >"$output_file" 2>&1; then
+          rm -f "$output_file"
+          return 0
+        fi
+
+        printf 'nix-vandy syncbranches: %s failed\n' "$step" >&2
+        cat "$output_file" >&2
+        rm -f "$output_file"
+        exit 1
+      }
+
+      join_branch_list() {
+        if [ "$#" -eq 0 ]; then
+          printf 'none'
+          return
+        fi
+
+        printf '%s' "$1"
+        shift
+        while [ "$#" -gt 0 ]; do
+          printf ', %s' "$1"
+          shift
+        done
+      }
+
       show_usage() {
         cat <<'EOF'
 Usage:
@@ -220,7 +252,9 @@ EOF
 
           trap restore_original_branch EXIT
 
-          repo_git fetch --all --prune
+          printf 'nix-vandy syncbranches\n'
+          printf '  fetch   origin\n'
+          run_repo_git_quiet 'fetching remotes' fetch --all --prune
 
           if ! repo_git show-ref --verify --quiet refs/heads/master; then
             printf 'nix-vandy syncbranches: local master branch not found\n' >&2
@@ -232,8 +266,9 @@ EOF
             exit 1
           fi
 
-          repo_git checkout master >/dev/null
-          repo_git pull --ff-only origin master
+          printf '  update  master\n'
+          run_repo_git_quiet 'checking out master' checkout master
+          run_repo_git_quiet 'fast-forwarding master from origin/master' pull --ff-only origin master
 
           mapfile -t branch_entries < <(repo_git for-each-ref --format='%(refname:short)|%(upstream:short)' refs/heads)
 
@@ -249,28 +284,28 @@ EOF
               continue
             fi
 
-            repo_git checkout "$branch_name" >/dev/null
-            repo_git rebase master
+            printf '  rebase  %s\n' "$branch_name"
+            run_repo_git_quiet "checking out $branch_name" checkout "$branch_name"
+            run_repo_git_quiet "rebasing $branch_name onto master" rebase master
             rebased_branches+=("$branch_name")
 
             case "$upstream_ref" in
               origin/*)
-                repo_git push --force-with-lease origin "$branch_name"
+                printf '  push    %s\n' "$branch_name"
+                run_repo_git_quiet "pushing $branch_name to $upstream_ref" push --force-with-lease origin "$branch_name"
                 pushed_branches+=("$branch_name")
                 ;;
               *)
+                printf '  skip    %s (no origin/* upstream)\n' "$branch_name"
                 skipped_push_branches+=("$branch_name")
                 ;;
             esac
           done
 
-          printf 'nix-vandy syncbranches: rebased %s\n' "''${rebased_branches[*]:-none}"
-          if [ "''${#pushed_branches[@]}" -gt 0 ]; then
-            printf 'nix-vandy syncbranches: pushed %s\n' "''${pushed_branches[*]}"
-          fi
-          if [ "''${#skipped_push_branches[@]}" -gt 0 ]; then
-            printf 'nix-vandy syncbranches: skipped push for %s (no origin/* upstream)\n' "''${skipped_push_branches[*]}"
-          fi
+          printf '  done\n'
+          printf '    rebased: %s\n' "$(join_branch_list "''${rebased_branches[@]}")"
+          printf '    pushed: %s\n' "$(join_branch_list "''${pushed_branches[@]}")"
+          printf '    skipped: %s\n' "$(join_branch_list "''${skipped_push_branches[@]}")"
           ;;
         -h|--help)
           show_usage
