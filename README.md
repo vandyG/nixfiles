@@ -6,7 +6,7 @@ Key notes
 - Rclone setup assumes I have set up a Google Drive remote.
 - Rclone config is not managed by Home Manager and must be configured separately (typically at ~/.config/rclone/rclone.conf).
 - Platform-specific behavior now lives in `profiles/` and is selected by profile name instead of long-lived Git branches.
-- A reusable `nix-vandy` helper is included; it scaffolds `.envrc` and `shell.nix` files for `direnv` projects and can also copy a Firefox `user.js` template into a profile directory.
+- A reusable `nix-vandy` helper is included; it scaffolds `.envrc`, `shell.nix`, and a per-project VS Code `.code-workspace` file for `direnv` projects and can also copy a Firefox `user.js` template into a profile directory.
 - `nix-vandy syncbranches` automates this repo's fetch/rebase/push workflow for all local branches that track `origin/*`.
 - Fish completions for `nix-vandy` are managed declaratively through Home Manager's `programs.fish.completions` and `programs.fish.functions` options, with file completions disabled by default and directory completion enabled only for `initff`.
 
@@ -22,7 +22,7 @@ Repository layout
 	- `starship-themes/` — prompt theme definitions such as `catppuccin_mocha` and `gruvbox_dark`.
 	- `templates.nix` — packages reusable project templates and exposes the `nix-vandy` helper commands.
 - `profiles/` — profile selectors that layer platform-specific modules and overrides on top of the shared configuration.
-- `modules/templates/direnv-shell/` — source templates used by `nix-vandy initshell` to create `.envrc` and `shell.nix` files.
+- `modules/templates/direnv-shell/` — source templates used by `nix-vandy initshell` to create `.envrc`, `shell.nix`, and a VS Code workspace file.
 
 Prerequisites
 - Nix installed on the system (https://nixos.org/download.html).
@@ -43,7 +43,7 @@ How to use
 
 	 - Enable and run Home Manager as documented in the Home Manager manual.
 
-4. After applying, use `nix-vandy initshell [--force]` inside any directory to drop in a ready-to-use `.envrc` and `shell.nix` that pins Python 3.13 and exports a compatible `LD_LIBRARY_PATH`.
+4. After applying, use `nix-vandy initshell [--force]` inside any directory to drop in a ready-to-use `.envrc`, `shell.nix`, and `<dirname>.code-workspace` file. The generated workspace file applies the same Nix language server and formatter settings used in this repo.
 
 5. Use `nix-vandy initff <firefox-profile-dir>` to copy the managed Firefox `user.js` template into a profile directory.
 

@@ -104,6 +104,7 @@ The `nix-vandy` helper provides `initshell`, `initff`, and `syncbranches` subcom
 ### Common errors
 
 - `nix-vandy initshell` fails because `.envrc` or `shell.nix` already exists.
+- `nix-vandy initshell` fails because the generated `<dirname>.code-workspace` file already exists.
 - `nix-vandy initff` fails because the Firefox profile directory does not exist.
 - `nix-vandy initff` fails because `user.js` already exists in the target profile.
 - `nix-vandy syncbranches` fails because the repo has staged or unstaged changes.
@@ -119,6 +120,8 @@ Overwrite shell templates intentionally:
 ```bash
 nix-vandy initshell --force
 ```
+
+The same `--force` flag also replaces the generated VS Code workspace file when it already exists.
 
 Check Firefox profile directories before copying the template:
 

@@ -1,22 +1,30 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   envProfile = builtins.getEnv "NIX_VANDY_PROFILE";
   localProfilePath = "${toString ./.}/profiles/local.nix";
   selectedProfile =
-    if envProfile != "" then envProfile
-    else if builtins.pathExists localProfilePath then import localProfilePath
-    else throw ''
-      nixfiles: set NIX_VANDY_PROFILE or create profiles/local.nix.
-      Supported profiles: ubuntu, wsl, wsl_work
-    '';
+    if envProfile != "" then
+      envProfile
+    else if builtins.pathExists localProfilePath then
+      import localProfilePath
+    else
+      throw ''
+        nixfiles: set NIX_VANDY_PROFILE or create profiles/local.nix.
+        Supported profiles: ubuntu, wsl, wsl_work
+      '';
   profileModules = {
     ubuntu = ./profiles/ubuntu.nix;
     wsl = ./profiles/wsl.nix;
     wsl_work = ./profiles/wsl_work.nix;
   };
-  profileModule = profileModules.${selectedProfile}
-    or (throw "nixfiles: unsupported profile '${selectedProfile}'");
+  profileModule =
+    profileModules.${selectedProfile} or (throw "nixfiles: unsupported profile '${selectedProfile}'");
 in
 
 {
@@ -37,6 +45,8 @@ in
     pkgs.uv
     pkgs.nerd-fonts.jetbrains-mono
     pkgs.gh
+    pkgs.nixfmt
+    pkgs.nixd
   ];
 
   home.sessionVariables = {
