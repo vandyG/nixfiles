@@ -22,7 +22,6 @@ in
     pkgs.uv
     pkgs.nerd-fonts.jetbrains-mono
     pkgs.gh
-    pkgs.azure-cli
   ];
 
   home.sessionVariables = {
