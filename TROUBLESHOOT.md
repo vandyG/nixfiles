@@ -109,6 +109,7 @@ The `nix-vandy` helper provides `initshell`, `initff`, and `syncbranches` subcom
 - `nix-vandy syncbranches` fails because `HEAD` is detached.
 - `nix-vandy syncbranches` stops on a rebase conflict in one of the local branches.
 - `nix-vandy syncbranches` skips push for a branch that does not track `origin/*`.
+- Fish does not offer completions for `nix-vandy` after the config was updated.
 
 ### Fixes
 
@@ -140,5 +141,9 @@ git rebase --continue
 # or
 git rebase --abort
 ```
+
+If Fish is not showing completions for `nix-vandy`, re-apply Home Manager and start a new shell session so Fish reloads the generated completion definitions.
+
+The custom Fish helper functions for `nix-vandy` intentionally avoid the `__fish_*` prefix so they do not collide with Fish's internal helper namespace.
 
 ---

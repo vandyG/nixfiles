@@ -7,6 +7,7 @@ Key notes
 - Rclone config is not managed by Home Manager and must be configured separately (typically at ~/.config/rclone/rclone.conf).
 - A reusable `nix-vandy` helper is included; it scaffolds `.envrc` and `shell.nix` files for `direnv` projects and can also copy a Firefox `user.js` template into a profile directory.
 - `nix-vandy syncbranches` automates this repo's fetch/rebase/push workflow for all local branches that track `origin/*`.
+- Fish completions for `nix-vandy` are managed declaratively through Home Manager's `programs.fish.completions` and `programs.fish.functions` options, with file completions disabled by default and directory completion enabled only for `initff`.
 
 Repository layout
 - `home.nix` — main Home Manager configuration entrypoint used to build and apply the user profile.
