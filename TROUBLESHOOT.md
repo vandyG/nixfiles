@@ -98,13 +98,17 @@ After the key exists, re-apply Home Manager so Git picks up the signing settings
 
 ## nix-vandy helper
 
-The `nix-vandy` helper provides `initshell` and `initff` subcommands.
+The `nix-vandy` helper provides `initshell`, `initff`, and `syncbranches` subcommands.
 
 ### Common errors
 
 - `nix-vandy initshell` fails because `.envrc` or `shell.nix` already exists.
 - `nix-vandy initff` fails because the Firefox profile directory does not exist.
 - `nix-vandy initff` fails because `user.js` already exists in the target profile.
+- `nix-vandy syncbranches` fails because the repo has staged or unstaged changes.
+- `nix-vandy syncbranches` fails because `HEAD` is detached.
+- `nix-vandy syncbranches` stops on a rebase conflict in one of the local branches.
+- `nix-vandy syncbranches` skips push for a branch that does not track `origin/*`.
 
 ### Fixes
 
@@ -119,6 +123,22 @@ Check Firefox profile directories before copying the template:
 ```bash
 ls ~/.mozilla/firefox
 nix-vandy initff ~/.mozilla/firefox/<profile>
+```
+
+Before running the branch sync workflow, ensure the checkout is clean:
+
+```bash
+git status --short --branch
+nix-vandy syncbranches
+```
+
+If the workflow stops during a rebase conflict, resolve the conflict in the current branch and continue or abort manually:
+
+```bash
+git status
+git rebase --continue
+# or
+git rebase --abort
 ```
 
 ---

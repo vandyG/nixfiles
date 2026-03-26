@@ -6,6 +6,7 @@ Key notes
 - Rclone setup assumes I have set up a Google Drive remote.
 - Rclone config is not managed by Home Manager and must be configured separately (typically at ~/.config/rclone/rclone.conf).
 - A reusable `nix-vandy` helper is included; it scaffolds `.envrc` and `shell.nix` files for `direnv` projects and can also copy a Firefox `user.js` template into a profile directory.
+- `nix-vandy syncbranches` automates this repo's fetch/rebase/push workflow for all local branches that track `origin/*`.
 
 Repository layout
 - `home.nix` — main Home Manager configuration entrypoint used to build and apply the user profile.
@@ -33,9 +34,11 @@ How to use
 
 4. Use `nix-vandy initff <firefox-profile-dir>` to copy the managed Firefox `user.js` template into a profile directory.
 
-5. If `~/.ssh/id_ed25519.pub` exists, the Git module automatically enables SSH-format commit signing and uses that public key as the signing key.
+5. Run `nix-vandy syncbranches` from a clean checkout of this repo to fetch `origin`, fast-forward `master`, rebase every other local branch onto `master`, and push tracked `origin/*` branches with `--force-with-lease`.
 
-6. Keep secrets and external configs (like `rclone.conf`) out of this repo.
+6. If `~/.ssh/id_ed25519.pub` exists, the Git module automatically enables SSH-format commit signing and uses that public key as the signing key.
+
+7. Keep secrets and external configs (like `rclone.conf`) out of this repo.
 
 Notes and troubleshooting
 - See `TROUBLESHOOT.md` for common issues when applying this configuration.
