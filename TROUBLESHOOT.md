@@ -3,6 +3,8 @@
 Table of contents
 
 - [rclone mount](#rclone-mount)
+- [git signing](#git-signing)
+- [nix-vandy helper](#nix-vandy-helper)
 
 ## rclone mount
 
@@ -31,6 +33,7 @@ This will show why the mount failed (bad remote name, FUSE error, permission iss
 
 - Rclone remote not configured.
 - fusermount3 error: "option allow_other only allowed if 'user_allow_other' is set in /etc/fuse.conf".
+- Local mount path `%h/data/Resume` does not exist yet.
 
 ---
 
@@ -55,6 +58,67 @@ user_allow_other
 ```bash
 #windows: wsl --shutdown (from Windows side)
 # otherwise, reboot the system
+```
+
+#### Create the local mount directory
+
+The service mounts into `%h/data/Resume`. If that directory does not exist, create it first:
+
+```bash
+mkdir -p ~/data/Resume
+```
+
+#### Verify the configured remote name
+
+The service expects the remote path `vandy23:Resume/`. Confirm it exists:
+
+```bash
+rclone listremotes
+rclone lsd vandy23:
+```
+
+## git signing
+
+The Git module enables SSH-format commit signing only when `~/.ssh/id_ed25519.pub` exists.
+
+### Symptoms
+
+- Commits are not signed even though Home Manager has been applied.
+- Git errors that the SSH signing key cannot be found.
+
+### Fix
+
+Create the expected SSH key pair or adjust the module to point at the public key you actually use:
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519
+```
+
+After the key exists, re-apply Home Manager so Git picks up the signing settings.
+
+## nix-vandy helper
+
+The `nix-vandy` helper provides `initshell` and `initff` subcommands.
+
+### Common errors
+
+- `nix-vandy initshell` fails because `.envrc` or `shell.nix` already exists.
+- `nix-vandy initff` fails because the Firefox profile directory does not exist.
+- `nix-vandy initff` fails because `user.js` already exists in the target profile.
+
+### Fixes
+
+Overwrite shell templates intentionally:
+
+```bash
+nix-vandy initshell --force
+```
+
+Check Firefox profile directories before copying the template:
+
+```bash
+ls ~/.mozilla/firefox
+nix-vandy initff ~/.mozilla/firefox/<profile>
 ```
 
 ---
