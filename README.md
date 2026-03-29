@@ -11,6 +11,12 @@ Key notes
 - `nix-vandy syncbranches` automates this repo's fetch/rebase/push workflow for all local branches that track `origin/*`.
 - Fish completions for `nix-vandy` are managed declaratively through Home Manager's `programs.fish.completions` and `programs.fish.functions` options, with file completions disabled by default and directory completion enabled only for `initff`.
 
+Firefox
+- Detailed setup is in [docs/firefox.md](docs/firefox.md).
+- The bundled Catppuccin Firefox theme lives in `modules/templates/firefox/catppuccin-theme/`.
+- The bundled Catppuccin website userstyle lives in `modules/templates/firefox/import.json`.
+- Use Firefox Color for browser theming and Stylus for website theming.
+
 Repository layout
 - `home.nix` — main Home Manager configuration entrypoint used to build and apply the user profile.
 - `modules/` — miscellaneous Nix modules split by purpose:
@@ -25,6 +31,8 @@ Repository layout
 - `profiles/` — profile selectors that layer platform-specific modules and overrides on top of the shared configuration.
 - `profiles/base-wsl.nix` — shared WSL base profile bits; the `programs.bash` stanza is currently commented out, so bash remains the default shell and any fish startup needs to come from the terminal app profile.
 - `modules/templates/direnv-shell/` — source templates used by `nix-vandy initshell` to create `.envrc`, `shell.nix`, and a VS Code workspace file.
+- `modules/templates/firefox/` — Firefox customization assets, including the bundled Catppuccin theme and userstyle import data.
+- `docs/firefox.md` — detailed Firefox setup guide covering Firefox Color and Stylus imports.
 
 Prerequisites
 - Nix installed on the system (https://nixos.org/download.html).
@@ -48,7 +56,7 @@ How to use
 
 4. After applying, use `nix-vandy initshell [--force]` inside any directory to drop in a ready-to-use `.envrc`, `shell.nix`, and `<dirname>.code-workspace` file. The generated workspace file applies the same Nix language server and formatter settings used in this repo.
 
-5. Use `nix-vandy initff <firefox-profile-dir>` to copy the managed Firefox `user.js` template into a profile directory.
+5. For Firefox customization, use `nix-vandy initff <firefox-profile-dir>` to install the managed Firefox `user.js` template, then follow [docs/firefox.md](docs/firefox.md) for Firefox Color and Stylus setup.
 
 6. Run `nix-vandy syncbranches` only if you still need to maintain the previous branch-based workflow during the transition.
 

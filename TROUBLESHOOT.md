@@ -4,6 +4,7 @@ Table of contents
 
 - [rclone mount](#rclone-mount)
 - [git signing](#git-signing)
+- [firefox customizations](#firefox-customizations)
 - [nix-vandy helper](#nix-vandy-helper)
 - [profile selection](#profile-selection)
 - [wsl shell startup](#wsl-shell-startup)
@@ -97,6 +98,24 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519
 ```
 
 After the key exists, re-apply Home Manager so Git picks up the signing settings.
+
+## firefox customizations
+
+The full setup guide is in [docs/firefox.md](docs/firefox.md). This section covers the common failure modes.
+
+### Symptoms
+
+- The bundled Catppuccin Firefox theme does not appear after import.
+- The bundled Catppuccin website styling does not apply on supported sites.
+- Firefox shows the wrong profile, so the imported theme or userstyle seems to be missing.
+
+### Fixes
+
+Install the Firefox Color extension and import the Catppuccin theme from [modules/templates/firefox/catppuccin-theme/](modules/templates/firefox/catppuccin-theme/). The packaging and import flow are described in the Catppuccin Firefox guide.
+
+Install the Stylus extension and import the Catppuccin userstyle from [modules/templates/firefox/import.json](modules/templates/firefox/import.json). The import flow is described in the Stylus usage guide.
+
+If the customizations are not visible, confirm that you imported them into the Firefox profile you actually use and that the relevant extensions are enabled for that profile.
 
 ## nix-vandy helper
 

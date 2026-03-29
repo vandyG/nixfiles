@@ -16,7 +16,7 @@ let
       path = ./templates/direnv-shell/workspace.code-workspace;
     }
   ];
-  firefoxUserTemplatePath = ./templates/user.js;
+  firefoxUserTemplatePath = ./templates/firefox/user.js;
 
   nixVandy = pkgs.writeShellApplication {
     name = "nix-vandy";
