@@ -6,6 +6,7 @@ Table of contents
 - [git signing](#git-signing)
 - [nix-vandy helper](#nix-vandy-helper)
 - [profile selection](#profile-selection)
+- [wsl shell startup](#wsl-shell-startup)
 
 ## rclone mount
 
@@ -179,5 +180,20 @@ The pre-migration branch state is recoverable from these local backup tags:
 - `backup/pre-profile-migration-ubuntu`
 - `backup/pre-profile-migration-wsl`
 - `backup/pre-profile-migration-wsl_work`
+
+## wsl shell startup
+
+In `profiles/base-wsl.nix`, the `programs.bash` block may be commented out. This does not normally break Home Manager evaluation, but it changes interactive shell behavior.
+
+### Symptoms
+
+- WSL starts in bash and no longer auto-switches into fish.
+- Bash sessions no longer source `~/.nix-profile/etc/profile.d/nix.sh` from that Home Manager hook.
+
+### Fixes
+
+If you want the old behavior back, uncomment the `programs.bash` stanza in `profiles/base-wsl.nix` and re-apply Home Manager.
+
+If you prefer keeping it disabled, set your default shell to fish through your distro/user settings instead of relying on bash `initExtra`.
 
 ---

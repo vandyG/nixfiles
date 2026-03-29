@@ -22,6 +22,7 @@ Repository layout
 	- `starship-themes/` — prompt theme definitions such as `catppuccin_mocha` and `gruvbox_dark`.
 	- `templates.nix` — packages reusable project templates and exposes the `nix-vandy` helper commands.
 - `profiles/` — profile selectors that layer platform-specific modules and overrides on top of the shared configuration.
+- `profiles/base-wsl.nix` — shared WSL base profile bits; the `programs.bash` stanza is currently commented out, so bash-specific init hooks in that file are not applied.
 - `modules/templates/direnv-shell/` — source templates used by `nix-vandy initshell` to create `.envrc`, `shell.nix`, and a VS Code workspace file.
 
 Prerequisites
