@@ -183,17 +183,20 @@ The pre-migration branch state is recoverable from these local backup tags:
 
 ## wsl shell startup
 
-In `profiles/base-wsl.nix`, the `programs.bash` block may be commented out. This does not normally break Home Manager evaluation, but it changes interactive shell behavior.
+In `profiles/base-wsl.nix`, the `programs.bash` block may be commented out. That leaves bash as the default shell in WSL, so fish will only start if the terminal app profile is configured to launch it directly.
 
 ### Symptoms
 
-- WSL starts in bash and no longer auto-switches into fish.
+- WSL starts in bash instead of fish.
+- VS Code integrated terminal, Windows Terminal, or Alacritty open bash because their profile/default shell still points at bash.
 - Bash sessions no longer source `~/.nix-profile/etc/profile.d/nix.sh` from that Home Manager hook.
 
 ### Fixes
 
-If you want the old behavior back, uncomment the `programs.bash` stanza in `profiles/base-wsl.nix` and re-apply Home Manager.
+Set the terminal app to launch fish directly if you want fish on startup. Alacritty already does this through `modules/alacritty.toml`; VS Code integrated terminal and Windows Terminal need their default profile or shell command updated separately.
 
-If you prefer keeping it disabled, set your default shell to fish through your distro/user settings instead of relying on bash `initExtra`.
+If you want the old behavior back inside WSL itself, uncomment the `programs.bash` stanza in `profiles/base-wsl.nix` and re-apply Home Manager so bash can hand off to fish again.
+
+If you prefer keeping it disabled, leave bash as the WSL default and rely on the terminal app profile to start fish.
 
 ---
