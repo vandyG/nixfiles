@@ -360,6 +360,6 @@ in
   };
 
   home.file.".local/share/nix-templates/firefox/user.js" = {
-    source = ./templates/user.js;
+    source = ./templates/firefox/user.js;
   };
 }
