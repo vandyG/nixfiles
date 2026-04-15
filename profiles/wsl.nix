@@ -1,5 +1,8 @@
 { ... }:
 
 {
-  imports = [ ./base-wsl.nix ];
+  imports = [ 
+    ./base-wsl.nix 
+    ../modules/rclone.nix
+    ];
 }
