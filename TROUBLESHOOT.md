@@ -8,6 +8,8 @@ Table of contents
 - [nix-vandy helper](#nix-vandy-helper)
 - [profile selection](#profile-selection)
 - [wsl shell startup](#wsl-shell-startup)
+- [flake usage](#flake-usage)
+- [nixos profile](#nixos-profile)
 
 ## rclone mount
 
@@ -177,7 +179,7 @@ The repo now selects platform-specific configuration through a profile instead o
 ### Common errors
 
 - Home Manager evaluation fails because neither `NIX_VANDY_PROFILE` nor `profiles/local.nix` is set.
-- Home Manager evaluation fails because the selected profile is not one of `ubuntu`, `wsl`, or `wsl_work`.
+- Home Manager evaluation fails because the selected profile is not one of `nixos`, `ubuntu`, `wsl`, or `wsl_work`.
 
 ### Fixes
 
@@ -218,4 +220,175 @@ If you want the old behavior back inside WSL itself, uncomment the `programs.bas
 
 If you prefer keeping it disabled, leave bash as the WSL default and rely on the terminal app profile to start fish.
 
+## mcp-nixos server not found in VS Code WSL
+
+When VS Code is opened via Remote WSL, the MCP server process does not inherit the terminal's `nix-shell` PATH. Even if you launched VS Code from a shell where `mcp-nixos` is available, the server will fail with `spawn mcp-nixos ENOENT`.
+
+A second cause is that the `mcp.json` on the **Windows side** (`C:/Users/<user>/AppData/Roaming/Code/User/mcp.json`) is picked up by the Windows VS Code process, not the WSL VS Code server, so commands that only exist in WSL/Nix are never found.
+
+### Fix
+
+Create a WSL-side MCP config at `~/.vscode-server/data/User/mcp.json` that uses `nix-shell --run` to launch `mcp-nixos` inside the correct Nix environment:
+
+```json
+{
+	"servers": {
+		"nixos": {
+			"command": "/nix/var/nix/profiles/default/bin/nix-shell",
+			"args": [
+				"/home/vandy/nixfiles/shell.nix",
+				"--run",
+				"mcp-nixos"
+			]
+		}
+	}
+}
+```
+
+- The full path to `nix-shell` (`/nix/var/nix/profiles/default/bin/nix-shell`) is used because the VS Code server environment may not include the Nix profile in `PATH`.
+- Using `nix-shell --run` ensures `mcp-nixos` runs with all `buildInputs` from `shell.nix` on its `PATH`.
+- The Windows-side `mcp.json` can remain as-is; the WSL-side file takes precedence for WSL workspace windows.
+
 ---
+
+## flake usage
+
+The repo includes a `flake.nix` that exposes `homeConfigurations` and `nixosConfigurations`.
+
+### Bootstrapping flakes on a new machine
+
+Flakes must be enabled before `home-manager switch --flake` works. On Ubuntu/WSL, add the following to `~/.config/nix/nix.conf` (create the file if it does not exist):
+
+```
+experimental-features = nix-command flakes
+```
+
+On NixOS, the `system/example-nixos/configuration.nix` template already includes:
+
+```nix
+nix.settings.experimental-features = [ "nix-command" "flakes" ];
+```
+
+Apply that via `sudo nixos-rebuild switch --flake .#<hostname>` once, then subsequent Home Manager runs can use the flake too.
+
+### First-time flake lock generation
+
+After cloning the repo on a new machine, run the following once to generate `flake.lock`:
+
+```bash
+nix flake update
+```
+
+Commit the resulting `flake.lock` so all machines stay on the same pinned nixpkgs.
+
+### `home-manager switch --flake` picks the wrong nixpkgs version
+
+If Home Manager evaluates against a different nixpkgs than expected, check that `flake.lock` is committed and up to date. The `inputs.nixpkgs.follows = "nixpkgs"` line in `flake.nix` ensures Home Manager uses the same nixpkgs pin as the system config.
+
+### Adding a new NixOS machine
+
+1. Copy `system/example-nixos/` to `system/<hostname>/`.
+2. Generate the hardware config on the target machine:
+
+	```bash
+	sudo nixos-generate-config --show-hardware-config > system/<hostname>/hardware-configuration.nix
+	```
+
+3. Edit `system/<hostname>/configuration.nix` — set `networking.hostName` and `time.timeZone` at minimum.
+4. Register the host in `flake.nix` under `nixosConfigurations`:
+
+	```nix
+	"<hostname>" = nixpkgs.lib.nixosSystem {
+	  inherit system;
+	  modules = [ ./system/<hostname>/configuration.nix ];
+	};
+	```
+
+5. Apply: `sudo nixos-rebuild switch --flake .#<hostname>`
+
+### Non-flake workflow still works
+
+If you need to apply without flakes (e.g., before bootstrapping flake support), the legacy command still works:
+
+```bash
+NIX_VANDY_PROFILE=wsl home-manager switch -f ~/nixfiles/home.nix
+```
+
+The `profile ? null` argument in `home.nix` falls back to `NIX_VANDY_PROFILE` / `profiles/local.nix` when the flake does not pass it.
+
+---
+
+## nixos profile
+
+The `nixos` profile (`profiles/nixos.nix`) allows using this repo on a NixOS machine with standalone Home Manager.
+
+### How it differs from ubuntu/wsl
+
+- `targets.genericLinux.enable` is intentionally **not set** on the `nixos` profile. NixOS manages `XDG_DATA_DIRS`, fontconfig, and locale natively via the system environment. Setting it to `true` on NixOS would conflict with the system's own setup.
+- System-level configuration (kernel, services, networking, hardware, users) is managed in `/etc/nixos/configuration.nix` (or a system flake), which is **separate from this repo**. This repo manages the user layer only.
+
+### Applying on NixOS
+
+1. Clone the repo and create `profiles/local.nix` returning `"nixos"`:
+
+	```nix
+	"nixos"
+	```
+
+2. Install standalone Home Manager if not already installed:
+
+	```bash
+	nix-channel --add https://github.com/nix-community/home-manager/archive/release-25.05.tar.gz home-manager
+	nix-channel --update
+	nix-shell '<home-manager>' -A install
+	```
+
+3. Apply with:
+
+	```bash
+	home-manager switch -f ~/nixfiles/home.nix
+	```
+
+### Fish not registered as a login shell on NixOS
+
+On NixOS, `home-manager switch` installs fish into the Nix store but does **not** add it to `/etc/shells` — that is controlled by the NixOS system configuration. Without it being in `/etc/shells`, `chsh` and login shells will refuse to use it.
+
+#### Fix
+
+Add the following to `/etc/nixos/configuration.nix` (or your system flake's NixOS module):
+
+```nix
+programs.fish.enable = true;
+```
+
+This registers fish in `/etc/shells` and generates the Fish system-level completions. After that, run `sudo nixos-rebuild switch` and then set fish as your login shell:
+
+```bash
+chsh -s /run/current-system/sw/bin/fish
+```
+
+### `targets.genericLinux.enable` set to true on NixOS (accidental)
+
+If you accidentally apply a profile that has `targets.genericLinux.enable = true` on NixOS, you may see duplicate or incorrect entries in `XDG_DATA_DIRS` and broken fontconfig lookups because the option tries to inject paths that NixOS already manages.
+
+#### Fix
+
+Ensure `profiles/local.nix` returns `"nixos"` (not `"ubuntu"`) and re-apply Home Manager.
+
+### rclone systemd user service on NixOS
+
+The rclone service in `modules/rclone.nix` is a `systemd.user` service and works on NixOS. However, NixOS does not enable user lingering by default, which means the service will only run while you are logged in.
+
+#### Fix (optional, for headless / always-on mounts)
+
+Add the following to `/etc/nixos/configuration.nix`:
+
+```nix
+users.users.vandy.linger = true;
+```
+
+Then run `sudo nixos-rebuild switch` and restart the user service:
+
+```bash
+systemctl --user restart rclone-Resume.service
+```

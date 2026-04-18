@@ -1,6 +1,9 @@
 { ... }:
 
 {
+  # Fix XDG_DATA_DIRS, fontconfig, and locale on non-NixOS Linux (WSL Ubuntu).
+  targets.genericLinux.enable = true;
+
   # programs.bash = {
   #   enable = true;
   #   initExtra = ''
