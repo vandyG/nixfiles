@@ -52,6 +52,11 @@
       #
       # Apply with: sudo nixos-rebuild switch --flake .#myhostname
       # -----------------------------------------------------------------------
-      nixosConfigurations = { };
+      nixosConfigurations = {
+        "vandy" = nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [ ./system/vandy/configuration.nix ];
+        };
+      };
     };
 }
