@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, self, ... }:
 
 {
   imports =
@@ -131,6 +131,11 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+  # Record the git revision of this flake in the system profile.
+  # Shows up in `nixos-rebuild list-generations` as Configuration Revision.
+  # Falls back to "dirty" if the tree has uncommitted changes.
+  system.configurationRevision = self.rev or self.dirtyShortRev or "dirty";
+
   system.stateVersion = "25.11"; # Did you read the comment?
 
 }

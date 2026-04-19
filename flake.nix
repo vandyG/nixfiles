@@ -55,6 +55,7 @@
       nixosConfigurations = {
         "vandy" = nixpkgs.lib.nixosSystem {
           inherit system;
+          specialArgs = { inherit self; };
           modules = [ ./system/vandy/configuration.nix ];
         };
       };
