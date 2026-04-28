@@ -66,7 +66,6 @@ in
     ./modules/shells.nix
     ./modules/git.nix
     ./modules/templates.nix
-    ./modules/copilot/copilot.nix
     profileModule
   ];
 }

@@ -7,10 +7,11 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   };
 
   outputs =
-    { self, nixpkgs, home-manager, ... }:
+    { self, nixpkgs, home-manager, nixos-hardware, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -43,11 +44,21 @@
       # Home Manager is NOT embedded here — it stays standalone above so the
       # same home.nix works on Ubuntu and WSL without changes.
       #
-      # Add one entry per NixOS machine:
+      # Add one entry per NixOS machine. Example for the Asus ROG Zephyrus G14
+      # GA403UV (Ryzen 9 7940HS + RTX 4060 Ada Lovelace). There is no dedicated
+      # nixos-hardware module for this model; compose from common modules:
       #
       #   "myhostname" = nixpkgs.lib.nixosSystem {
       #     inherit system;
-      #     modules = [ ./system/myhostname/configuration.nix ];
+      #     modules = [
+      #       nixos-hardware.nixosModules.common-cpu-amd
+      #       nixos-hardware.nixosModules.common-cpu-amd-pstate
+      #       nixos-hardware.nixosModules.common-gpu-amd
+      #       nixos-hardware.nixosModules.common-gpu-nvidia  # PRIME offload
+      #       nixos-hardware.nixosModules.common-pc-laptop
+      #       nixos-hardware.nixosModules.common-pc-ssd
+      #       ./system/myhostname/configuration.nix
+      #     ];
       #   };
       #
       # Apply with: sudo nixos-rebuild switch --flake .#myhostname
