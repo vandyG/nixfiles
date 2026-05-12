@@ -22,7 +22,9 @@ in
                     ms-toolsai.vscode-jupyter-cell-tags
                     github.copilot-chat
                     jnoortheen.nix-ide
-                    mkhl.direnv
+                    charliermarsh.ruff
+                    catppuccin.catppuccin-vsc
+                    catppuccin.catppuccin-vsc-icons
                 ]
                 ++
                 (
@@ -35,6 +37,18 @@ in
                     ]
                 )
                 ;
+                userMcp = {
+                    servers = {
+                        "nixos"= {
+                            "command"= "nix";
+                            "args"= [
+                                "run"
+                                "github:utensils/mcp-nixos"
+                                "--"
+                            ];
+                        };
+                    };
+                };
             };
         };
     };
