@@ -1,7 +1,5 @@
 {
-  config,
   pkgs,
-  lib,
   nix-vscode-extensions,
   ...
 }:
@@ -80,6 +78,28 @@ in
             "editor.tabSize"= 2;
           };
           "files.autoSave" = "off"; 
+          "nix.enableLanguageServer"= true;
+          "nix.serverPath"= "nixd";
+          "nix.serverSettings"= {
+            "nixd"= {
+              "formatting"= {
+                "command"= [
+                  "nixfmt"
+                ];
+              };
+              "nixpkgs"= {
+                "expr"= "import <nixpkgs> { }";
+              };
+              "options"= {
+                "nixos"= {
+                  "expr"= "(builtins.getFlake (builtins.toString ./.)).nixosConfigurations.vandy.options";
+                };
+                "home-manager"= {
+                  "expr"= "(builtins.getFlake (builtins.toString ./.)).homeConfigurations.vandy-nixos.options";
+                };
+              };
+            };
+          };
         };
       };
     };
