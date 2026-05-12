@@ -8,6 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ./hardware
     ];
 
   # Bootloader.
@@ -134,5 +135,5 @@
   system.configurationRevision = self.rev or self.dirtyShortRev or "dirty";
 
   system.stateVersion = "25.11"; # Did you read the comment?
-
+  
 }
