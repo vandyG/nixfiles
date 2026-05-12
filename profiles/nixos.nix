@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ../modules/rclone.nix
+    # ../modules/rclone.nix
     ../modules/alacritty.nix
     ../modules/appearance.nix
     ../modules/vscode.nix
