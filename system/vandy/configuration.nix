@@ -87,9 +87,6 @@
     ];
   };
 
-  # Install firefox.
-  programs.firefox.enable = true;
-
   # Enable flakes and the new nix CLI.
   nix.settings.experimental-features = [
     "nix-command"
