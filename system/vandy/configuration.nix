@@ -8,11 +8,14 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./hardware
+      ./hardware/asus.nix
+      ./hardware/nvidia.nix
     ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
+  # Shared ESP is very small on this triple-boot machine.
+  boot.loader.systemd-boot.configurationLimit = 1;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "vandy"; # Define your hostname.
@@ -103,6 +106,8 @@
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
   ];
+
+  programs.steam.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
