@@ -8,8 +8,10 @@ Table of contents
 - [nix-vandy helper](#nix-vandy-helper)
 - [profile selection](#profile-selection)
 - [wsl shell startup](#wsl-shell-startup)
+- [asusd service](#asusd-service)
 - [flake usage](#flake-usage)
 - [nixos profile](#nixos-profile)
+- [full efi partition](#full-efi-partition)
 
 ## rclone mount
 
@@ -220,6 +222,34 @@ If you want the old behavior back inside WSL itself, uncomment the `programs.bas
 
 If you prefer keeping it disabled, leave bash as the WSL default and rely on the terminal app profile to start fish.
 
+## asusd service
+
+### Symptoms
+
+- `asusd.service` fails with `status=226/NAMESPACE`.
+- `systemctl status asusd` shows `Failed to set up mount namespacing: /etc/asusd: No such file or directory`.
+- `asusctl` reports that `asusd.service` is not running.
+
+### Fix
+
+Create the `/etc/asusd` directory before the daemon starts. On this repo, the NixOS hardware module does that with a tmpfiles rule in [system/vandy/hardware/asus.nix](system/vandy/hardware/asus.nix).
+
+If you are adapting the config elsewhere, add a rule like this:
+
+```nix
+systemd.tmpfiles.rules = [
+	"d /etc/asusd 0755 root root -"
+];
+```
+
+After applying the change, restart the service or reboot:
+
+```bash
+sudo systemctl restart asusd
+```
+
+The `ExecStartPre` `sleep` line in the unit is not the real problem here. It is just where systemd reports the sandbox failure after `/etc/asusd` is missing.
+
 ## mcp-nixos server not found in VS Code WSL
 
 When VS Code is opened via Remote WSL, the MCP server process does not inherit the terminal's `nix-shell` PATH. Even if you launched VS Code from a shell where `mcp-nixos` is available, the server will fail with `spawn mcp-nixos ENOENT`.
@@ -374,6 +404,23 @@ If you accidentally apply a profile that has `targets.genericLinux.enable = true
 #### Fix
 
 Ensure `profiles/local.nix` returns `"nixos"` (not `"ubuntu"`) and re-apply Home Manager.
+
+## full efi partition
+
+### Symptoms
+
+- `nixos-rebuild switch` fails while running `systemd-boot` with `No space left on device`.
+- The traceback mentions copying an initrd into `/boot/EFI/nixos`.
+
+### Cause
+
+systemd-boot stores copied kernels and initrds on the EFI system partition. On a triple-boot machine with a small shared ESP, a few generations can fill the partition before the bootloader gets a chance to prune old files.
+
+### Fixes
+
+Keep `boot.loader.systemd-boot.configurationLimit` low on this host so future rebuilds only retain a small number of generations.
+
+If the ESP is already full, free space once by deleting obsolete NixOS boot files from the ESP, then re-run `sudo nixos-rebuild switch --flake .#vandy`. After that, the generation limit keeps the partition from filling up again.
 
 ### rclone systemd user service on NixOS
 
