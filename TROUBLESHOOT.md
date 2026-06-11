@@ -197,6 +197,25 @@ Or create an untracked `profiles/local.nix` file in the repo so each machine kee
 "wsl_work"
 ```
 
+## home-manager user mismatch
+
+### Symptoms
+
+- Home Manager activation fails with `USER is "<current-user>", expected "<configured-user>"`.
+- The selected profile is correct, but the config is being applied from the wrong Linux account.
+
+### Fix
+
+Use the profile that matches the account you are logged into. In this repo, `wsl_work` is wired to the `vgoel` account and the other profiles are wired to `vandy`.
+
+If you are on the `vgoel` account, apply the WSL work profile:
+
+```bash
+home-manager switch --flake .#vandy-wsl_work
+```
+
+If you want the profile to work for a different account, update `home.username` and `home.homeDirectory` in [home.nix](home.nix) to match that account.
+
 The pre-migration branch state is recoverable from these local backup tags:
 
 - `backup/pre-profile-migration-master`

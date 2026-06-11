@@ -7,6 +7,7 @@ Key notes
 - Rclone config is not managed by Home Manager and must be configured separately (typically at ~/.config/rclone/rclone.conf).
 - Platform-specific behavior now lives in `profiles/` and is selected by profile name instead of long-lived Git branches.
 - Supported profiles: `nixos`, `ubuntu`, `wsl`, `wsl_work`.
+- The `wsl_work` profile targets the `vgoel` Linux account; the other profiles target `vandy`.
 - In WSL, `profiles/base-wsl.nix` now leaves bash as the default shell. Launch fish from the terminal app profile instead; Alacritty already does this, while VS Code integrated terminal and Windows Terminal need their default shell/profile pointed at fish.
 - Windows Terminal has a bundled settings template in `modules/templates/windows-terminal/settings.json`; its Ubuntu profile starts `fish` through WSL so the terminal opens in the right shell.
 - A reusable `nix-vandy` helper is included; it scaffolds `.envrc`, `shell.nix`, and a per-project VS Code `.code-workspace` file for `direnv` projects and can also copy a Firefox `user.js` template into a profile directory.
@@ -50,6 +51,8 @@ Prerequisites
 How to use
 1. Inspect `home.nix` to see enabled modules and settings.
 2. Select the active platform before applying Home Manager. Either export `NIX_VANDY_PROFILE` or create an untracked `profiles/local.nix` file that returns one of `"nixos"`, `"ubuntu"`, `"wsl"`, or `"wsl_work"`.
+
+	Use `wsl_work` when applying the config from the `vgoel` account.
 
 	Example `profiles/local.nix`:
 
