@@ -5,7 +5,7 @@
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nixfiles/modules/copilot/skills";
 
-  programs.github-copilot-cli. = {
+  programs.github-copilot-cli = {
     enable = true;
     enableMcpIntegration = true;
   };
