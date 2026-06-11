@@ -10,6 +10,7 @@ Key notes
 - The `wsl_work` profile targets the `vgoel` Linux account; the other profiles target `vandy`.
 - In WSL, `profiles/base-wsl.nix` now leaves bash as the default shell. Launch fish from the terminal app profile instead; Alacritty already does this, while VS Code integrated terminal and Windows Terminal need their default shell/profile pointed at fish.
 - Windows Terminal has a bundled settings template in `modules/templates/windows-terminal/settings.json`; its Ubuntu profile starts `fish` through WSL so the terminal opens in the right shell.
+- GitHub HTTPS remotes are rewritten to SSH by default (`https://github.com/...` becomes `git@github.com:...`) so `git push` does not prompt for a username/password.
 - A reusable `nix-vandy` helper is included; it scaffolds `.envrc`, `shell.nix`, and a per-project VS Code `.code-workspace` file for `direnv` projects and can also copy a Firefox `user.js` template into a profile directory.
 - `nix-vandy syncbranches` automates this repo's fetch/rebase/push workflow for all local branches that track `origin/*`.
 - Per-project Git identity is set with the direnv `git_identity "<name>" "<email>" [signing-key]` helper (defined in `modules/shells.nix`). Call it from a project's `.envrc`; it overrides `user.name`/`user.email` and SSH-signs commits and tags via Git's `GIT_CONFIG_*` env vars, leaving the global identity in `git.nix` as the default. `gh` (GitHub CLI) auth is unaffected and stays on the personal account.

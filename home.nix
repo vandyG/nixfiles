@@ -76,6 +76,11 @@ in
     pkgs.mcp-nixos
   ];
 
+  programs.gh = {
+    enable = true;
+    settings.git_protocol = "ssh";
+  };
+
   home.sessionVariables = {
     EDITOR = "code";
     SHELL = "fish";

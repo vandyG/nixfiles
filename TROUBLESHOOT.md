@@ -103,6 +103,31 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519
 
 After the key exists, re-apply Home Manager so Git picks up the signing settings.
 
+## git push asks for username/password
+
+GitHub HTTPS remotes are rewritten to SSH by default in [modules/git.nix](modules/git.nix), and `gh` is configured to clone over SSH as well.
+
+### Symptoms
+
+- `git push` asks for a GitHub username and password.
+- `gh repo clone` still uses `https://github.com/...`.
+
+### Fix
+
+Confirm the remote is a GitHub URL and re-open the shell so the rewritten Git config is active:
+
+```bash
+git remote -v
+```
+
+If the remote is already set to an HTTPS GitHub URL, Git should rewrite it automatically. If you prefer to make the change explicit for one repo, run:
+
+```bash
+git remote set-url origin git@github.com:OWNER/REPO.git
+```
+
+If you use more than one GitHub account, remember that SSH authentication keys are per account. In that case, keep the rewrite but add separate SSH auth keys and SSH host aliases for each account.
+
 ### Per-project identity and signing (direnv)
 
 Use the `git_identity` direnv helper (defined in `modules/shells.nix`) inside a project's `.envrc` to override the committer identity and SSH-sign commits/tags for that project only:
