@@ -59,6 +59,39 @@
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
+
+    # Reusable helpers available in every `.envrc`.
+    stdlib = ''
+      # git_identity <name> <email> [signing-key]
+      #
+      # Set a per-project Git identity (name/email) and SSH-sign commits & tags
+      # for the duration of the direnv environment. Uses Git's GIT_CONFIG_*
+      # env-var mechanism (Git >= 2.31), which takes precedence over the global
+      # config from git.nix without touching any files on disk.
+      #
+      # The signing key defaults to ~/.ssh/id_ed25519.pub (same as the global
+      # config). Pass a third argument to sign with a dedicated work key.
+      #
+      # Usage in a project's .envrc:
+      #   git_identity "Vandy Goel" "vandy.goel@work.com" "$HOME/.ssh/work_ed25519.pub"
+      git_identity() {
+        local name="$1"
+        local email="$2"
+        local key="''${3:-$HOME/.ssh/id_ed25519.pub}"
+        local i="''${GIT_CONFIG_COUNT:-0}"
+
+        export "GIT_CONFIG_KEY_''${i}=user.name";       export "GIT_CONFIG_VALUE_''${i}=$name";  i=$((i + 1))
+        export "GIT_CONFIG_KEY_''${i}=user.email";      export "GIT_CONFIG_VALUE_''${i}=$email"; i=$((i + 1))
+        export "GIT_CONFIG_KEY_''${i}=gpg.format";      export "GIT_CONFIG_VALUE_''${i}=ssh";    i=$((i + 1))
+        export "GIT_CONFIG_KEY_''${i}=user.signingkey"; export "GIT_CONFIG_VALUE_''${i}=$key";   i=$((i + 1))
+        export "GIT_CONFIG_KEY_''${i}=commit.gpgsign";  export "GIT_CONFIG_VALUE_''${i}=true";   i=$((i + 1))
+        export "GIT_CONFIG_KEY_''${i}=tag.gpgsign";     export "GIT_CONFIG_VALUE_''${i}=true";   i=$((i + 1))
+
+        export GIT_CONFIG_COUNT="$i"
+
+        watch_file "$key"
+      }
+    '';
   };
 
 }

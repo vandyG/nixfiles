@@ -103,6 +103,23 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519
 
 After the key exists, re-apply Home Manager so Git picks up the signing settings.
 
+### Per-project identity and signing (direnv)
+
+Use the `git_identity` direnv helper (defined in `modules/shells.nix`) inside a project's `.envrc` to override the committer identity and SSH-sign commits/tags for that project only:
+
+```bash
+git_identity "Vandy Goel" "vandy.goel@work.com" "$HOME/.ssh/work_ed25519.pub"
+```
+
+This exports `GIT_CONFIG_*` env vars (Git >= 2.31) that take precedence over the global config from `git.nix`. The third argument is optional and defaults to `~/.ssh/id_ed25519.pub`.
+
+#### Symptoms
+
+- Per-project name/email is not applied: run `direnv allow` and confirm `git config user.email` reports the expected value from inside the project directory.
+- Commits are signed with the wrong key: pass an explicit signing-key path as the third argument; without it the helper falls back to the global `~/.ssh/id_ed25519.pub`.
+- Commits sign locally but show "Unverified" on the git host: the public signing key must be registered as a **signing key** on the account whose verified email matches the committer email. `gh` auth stays on the personal account and does not affect this — registration is per git host.
+- GUI Git tools ignore the identity: the helper only applies inside the direnv-loaded shell. Launch the tool from a terminal where direnv is active, or set a repo-local `git config` instead.
+
 ## firefox customizations
 
 The full setup guide is in [docs/firefox.md](docs/firefox.md). This section covers the common failure modes.

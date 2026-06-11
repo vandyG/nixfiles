@@ -12,6 +12,7 @@ Key notes
 - Windows Terminal has a bundled settings template in `modules/templates/windows-terminal/settings.json`; its Ubuntu profile starts `fish` through WSL so the terminal opens in the right shell.
 - A reusable `nix-vandy` helper is included; it scaffolds `.envrc`, `shell.nix`, and a per-project VS Code `.code-workspace` file for `direnv` projects and can also copy a Firefox `user.js` template into a profile directory.
 - `nix-vandy syncbranches` automates this repo's fetch/rebase/push workflow for all local branches that track `origin/*`.
+- Per-project Git identity is set with the direnv `git_identity "<name>" "<email>" [signing-key]` helper (defined in `modules/shells.nix`). Call it from a project's `.envrc`; it overrides `user.name`/`user.email` and SSH-signs commits and tags via Git's `GIT_CONFIG_*` env vars, leaving the global identity in `git.nix` as the default. `gh` (GitHub CLI) auth is unaffected and stays on the personal account.
 - Fish completions for `nix-vandy` are managed declaratively through Home Manager's `programs.fish.completions` and `programs.fish.functions` options, with file completions disabled by default and directory completion enabled only for `initff`.
 - `targets.genericLinux.enable` is set to `true` in the `ubuntu` and `wsl`/`wsl_work` profiles. It is intentionally absent from the `nixos` profile — NixOS handles `XDG_DATA_DIRS`, fontconfig, and locale natively and enabling it there would conflict.
 
@@ -31,7 +32,7 @@ Repository layout
 	- `rclone.nix` — Rclone-related helpers and service definitions.
 	- `alacritty.nix` — Alacritty configuration used by the Ubuntu profile; its terminal profile launches fish directly.
 	- `appearance.nix` — optional GNOME/GTK appearance helpers used by the Ubuntu profile.
-	- `shells.nix` — shell configuration (fish, bash, etc.) and environment settings.
+	- `shells.nix` — shell configuration (fish, bash, etc.), environment settings, and the direnv `stdlib` `git_identity` helper for per-project Git identity and SSH signing.
 	- `starship.nix` — Starship prompt configuration with a shared base config merged with a selectable theme.
 	- `starship-themes/` — prompt theme definitions such as `catppuccin_mocha` and `gruvbox_dark`.
 	- `templates.nix` — packages reusable project templates and exposes the `nix-vandy` helper commands.
