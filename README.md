@@ -34,8 +34,8 @@ Repository layout
 	- `alacritty.nix` — Alacritty configuration used by the Ubuntu profile; its terminal profile launches fish directly.
 	- `appearance.nix` — optional GNOME/GTK appearance helpers used by the Ubuntu profile.
 	- `shells.nix` — shell configuration (fish, bash, etc.), environment settings, and the direnv `stdlib` `git_identity` helper for per-project Git identity and SSH signing.
-	- `starship.nix` — Starship prompt configuration with a shared base config merged with a selectable theme.
-	- `starship-themes/` — prompt theme definitions such as `catppuccin_mocha` and `gruvbox_dark`.
+	- `starship.nix` — Starship prompt configuration with a shared base config merged with a selectable theme. To switch Catppuccin flavour, set `catppuccinFlavour` to one of `mocha`, `frappe`, `macchiato`, or `latte`. To switch to a different theme entirely, change `theme = themes.catppuccin` to `theme = themes.gruvbox_dark`.
+	- `starship-themes/` — prompt theme definitions: `catppuccin.nix` (all four Catppuccin flavours, parameterised by flavour name) and `gruvbox_dark.nix`.
 	- `templates.nix` — packages reusable project templates and exposes the `nix-vandy` helper commands.
 - `profiles/` — profile selectors that layer platform-specific modules and overrides on top of the shared configuration.
 - `profiles/base-wsl.nix` — shared WSL base profile bits; the `programs.bash` stanza is currently commented out, so bash remains the default shell and any fish startup needs to come from the terminal app profile.
