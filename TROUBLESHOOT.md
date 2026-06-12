@@ -12,6 +12,7 @@ Table of contents
 - [flake usage](#flake-usage)
 - [nixos profile](#nixos-profile)
 - [full efi partition](#full-efi-partition)
+- [windows terminal template](#windows-terminal-template)
 
 ## rclone mount
 
@@ -282,6 +283,24 @@ Set the terminal app to launch fish directly if you want fish on startup. Alacri
 If you want the old behavior back inside WSL itself, uncomment the `programs.bash` stanza in `profiles/base-wsl.nix` and re-apply Home Manager so bash can hand off to fish again.
 
 If you prefer keeping it disabled, leave bash as the WSL default and rely on the terminal app profile to start fish.
+
+## windows terminal template
+
+Windows Terminal appearance settings are split between the machine-specific [modules/templates/windows-terminal/settings.json](modules/templates/windows-terminal/settings.json) file and the shared [modules/templates/windows-terminal/appearance.json](modules/templates/windows-terminal/appearance.json) fragment.
+
+### Symptoms
+
+- Catppuccin schemes or themes are missing after copying the template.
+- Windows Terminal reports that it cannot load the imported appearance fragment.
+- The profile list looks wrong on a new machine, but the shared colors still match.
+
+### Fix
+
+Keep both files together so the relative `import` path in [modules/templates/windows-terminal/settings.json](modules/templates/windows-terminal/settings.json) still resolves to [modules/templates/windows-terminal/appearance.json](modules/templates/windows-terminal/appearance.json).
+
+If the profiles differ on a machine, edit only the profile list and GUIDs in [modules/templates/windows-terminal/settings.json](modules/templates/windows-terminal/settings.json); the shared fragment is meant to stay unchanged.
+
+If you are on an older Windows Terminal build, make sure it supports preview themes before assuming the fragment import failed.
 
 ## asusd service
 
