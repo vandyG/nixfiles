@@ -11,10 +11,21 @@
       url = "github:nix-community/nix-vscode-extensions";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    { self, nixpkgs, home-manager, nix-vscode-extensions, ... }:
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      nix-vscode-extensions,
+      stylix,
+      ...
+    }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -25,7 +36,10 @@
         home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = { inherit profile nix-vscode-extensions; };
-          modules = [ ./home.nix ];
+          modules = [ 
+            ./home.nix 
+            stylix.homeModules.stylix
+          ];
         };
     in
     {

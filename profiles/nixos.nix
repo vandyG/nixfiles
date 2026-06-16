@@ -8,6 +8,7 @@
     ../modules/vscode.nix
     ../modules/firefox.nix
     ../modules/ghostty.nix
+    ../modules/stylix.nix
   ];
 
   # targets.genericLinux.enable is intentionally NOT set here.
