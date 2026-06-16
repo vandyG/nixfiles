@@ -19,6 +19,7 @@
 
   # Bootloader.
   boot.loader.limine.enable = true;
+  boot.loader.limine.secureBoot.enable = true;
   # boot.loader.systemd-boot.enable = true;
   # Shared ESP is very small on this triple-boot machine.
   boot.loader.systemd-boot.configurationLimit = 1;
