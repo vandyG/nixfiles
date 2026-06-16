@@ -7,6 +7,7 @@
     ../modules/appearance.nix
     ../modules/vscode.nix
     ../modules/firefox.nix
+    ../modules/ghostty.nix
   ];
 
   # targets.genericLinux.enable is intentionally NOT set here.
