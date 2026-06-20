@@ -21,6 +21,7 @@
   # Bootloader.
   boot.loader.limine.enable = true;
   boot.loader.limine.secureBoot.enable = true;
+  boot.loader.limine.style.wallpapers = [ ../../modules/templates/minimalist-black-hole.png ];
   # boot.loader.systemd-boot.enable = true;
   # Shared ESP is very small on this triple-boot machine.
   boot.loader.systemd-boot.configurationLimit = 1;
@@ -120,8 +121,6 @@
     #  wget
     sbctl
   ];
-
-  programs.steam.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
