@@ -6,5 +6,6 @@
     targets.starship.enable = false;
     targets.vscode.enable = false;
     targets.firefox.enable = false;
+    polarity = "dark";
   };
 }
