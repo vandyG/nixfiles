@@ -19,5 +19,8 @@
     pkgs.gtk-engine-murrine
     pkgs.sassc
     pkgs.gnome-themes-extra
+    pkgs.stremio-linux-shell
+    pkgs.gnomeExtensions.rounded-window-corners-reborn   
+    pkgs.gnomeExtensions.hide-topbar
   ];
 }
