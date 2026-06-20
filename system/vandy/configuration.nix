@@ -15,6 +15,7 @@
     ./hardware-configuration.nix
     ./hardware/asus.nix
     ./hardware/nvidia.nix
+    ./steam.nix
   ];
 
   # Bootloader.
