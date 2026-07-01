@@ -11,20 +11,28 @@
       url = "github:nix-community/nix-vscode-extensions";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # --- Copilot agents & skills ---
+    obsidian-skills = {
+      url = "github:kepano/obsidian-skills";
+      flake = false;
+    };
   };
 
   outputs =
-    { self, nixpkgs, home-manager, nix-vscode-extensions, ... }:
+    { self, nixpkgs, home-manager, nix-vscode-extensions, obsidian-skills, ... }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+
+      copilotSources = import ./modules/copilot/sources.nix { inherit obsidian-skills; };
 
       # Build a standalone Home Manager configuration for a named profile.
       mkHome =
         profile:
         home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          extraSpecialArgs = { inherit profile nix-vscode-extensions; };
+          extraSpecialArgs = { inherit profile nix-vscode-extensions copilotSources; };
           modules = [ ./home.nix ];
         };
     in

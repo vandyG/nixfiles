@@ -14,6 +14,34 @@ Table of contents
 - [full efi partition](#full-efi-partition)
 - [windows terminal template](#windows-terminal-template)
 
+## copilot skills
+
+### Skills not appearing after `home-manager switch`
+
+The `programs.github-copilot-cli.skills` option writes skill entries to `~/.copilot/skills/` (or `$COPILOT_HOME/skills/`). If skills are missing:
+
+1. Confirm `~/.copilot/skills/` is not a stale symlink left over from the old `mkOutOfStoreSymlink` approach. If it is, the activation will fail with `mkdir: cannot create directory '~/.copilot/skills': File exists`. Remove the symlink and re-run:
+   ```bash
+   rm ~/.copilot/skills
+   home-manager switch --flake .#<profile>
+   ```
+2. Run `home-manager switch` again — HM manages the directory exclusively and will recreate it.
+
+### Local skill changes not picked up
+
+Local skills (`powerbi-modeling`, `powerbi-sql`) are copied into the Nix store at activation time. Edits to files under `modules/copilot/skills/` require a `home-manager switch` to take effect — unlike the old symlink approach, live edits are not reflected immediately.
+
+### External skill is outdated
+
+External skills are pinned in `flake.lock`. To pull upstream changes run:
+
+```bash
+nix flake update obsidian-skills
+home-manager switch --flake .#<profile>
+```
+
+---
+
 ## rclone mount
 
 Short guide to diagnose and fix a failing rclone mount service (user unit: `rclone-Resume.service`).
