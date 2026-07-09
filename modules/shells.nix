@@ -4,6 +4,39 @@
   programs.fish = {
     enable = true;
     functions = {
+      wscode.argumentNames = [ "drive" "path" ];
+      wscode.description = "Open a directory in VSCode via Windows PowerShell using a Windows drive mapping.";
+      wscode.body = ''
+        if test (count $argv) -eq 0 -o "$argv[1]" = "-h" -o "$argv[1]" = "--help"
+          echo "Usage: wscode <drive-letter> [path]"
+          echo ""
+          echo "Opens a directory in VSCode via Windows PowerShell using a Windows drive mapping."
+          echo ""
+          echo "Arguments:"
+          echo "  drive-letter  Windows drive letter (e.g. Z)"
+          echo "  path          Directory path to open (default: current directory)"
+          echo ""
+          echo "Example:"
+          echo "  wscode Z /home/vgoel/work/InsightAI"
+          return 0
+        end
+
+        set -l drive (string upper $argv[1])
+        set -l dir_path $PWD
+        if test (count $argv) -ge 2
+          set dir_path $argv[2]
+        end
+
+        # Resolve to absolute path so relative paths (e.g. ".") expand correctly
+        set dir_path (realpath $dir_path)
+
+        # Convert Unix path separators to Windows backslashes
+        set -l win_path (string replace -a "/" "\\" $dir_path)
+        set -l full_path "$drive:$win_path"
+
+        powershell.exe -Command "code '$full_path'"
+      '';
+
       __nix_vandy_needs_command.body = ''
         set -l cmd (commandline -opc)
         test (count $cmd) -eq 1
@@ -20,6 +53,13 @@
     };
 
     completions = {
+      wscode = ''
+        complete -c wscode -f
+        complete -c wscode -s h -l help -d 'Show help'
+        complete -c wscode -n 'test (count (commandline -opc)) -eq 1' -a 'C D E F G H I J K L M N O P Q R S T U V W X Y Z' -d 'Windows drive letter'
+        complete -c wscode -n 'test (count (commandline -opc)) -eq 2' -F -d 'Directory path to open in VSCode'
+      '';
+
       nix-vandy = ''
         complete -c nix-vandy -f
         complete -c nix-vandy -s h -l help -d 'Show help'

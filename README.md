@@ -15,6 +15,7 @@ Key notes
 - `nix-vandy syncbranches` automates this repo's fetch/rebase/push workflow for all local branches that track `origin/*`.
 - Per-project Git identity is set with the direnv `git_identity "<name>" "<email>" [signing-key]` helper (defined in `modules/shells.nix`). Call it from a project's `.envrc`; it overrides `user.name`/`user.email` and SSH-signs commits and tags via Git's `GIT_CONFIG_*` env vars, leaving the global identity in `git.nix` as the default. `gh` (GitHub CLI) auth is unaffected and stays on the personal account.
 - Fish completions for `nix-vandy` are managed declaratively through Home Manager's `programs.fish.completions` and `programs.fish.functions` options, with file completions disabled by default and directory completion enabled only for `initff`.
+- `wscode <drive-letter> [path]` opens a directory in VS Code via Windows PowerShell (`powershell.exe -Command "code <drive>:\<path>"`). Useful in WSL when a distro root is mapped to a Windows drive letter (e.g. `Z:`). Defaults to the current directory if no path is given. Tab-completes drive letters and directory paths.
 - `targets.genericLinux.enable` is set to `true` in the `ubuntu` and `wsl`/`wsl_work` profiles. It is intentionally absent from the `nixos` profile — NixOS handles `XDG_DATA_DIRS`, fontconfig, and locale natively and enabling it there would conflict.
 
 Firefox

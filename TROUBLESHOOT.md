@@ -6,6 +6,7 @@ Table of contents
 - [git signing](#git-signing)
 - [firefox customizations](#firefox-customizations)
 - [nix-vandy helper](#nix-vandy-helper)
+- [wscode helper](#wscode-helper)
 - [profile selection](#profile-selection)
 - [wsl shell startup](#wsl-shell-startup)
 - [asusd service](#asusd-service)
@@ -244,6 +245,37 @@ git rebase --abort
 If Fish is not showing completions for `nix-vandy`, re-apply Home Manager and start a new shell session so Fish reloads the generated completion definitions.
 
 The custom Fish helper functions for `nix-vandy` intentionally avoid the `__fish_*` prefix so they do not collide with Fish's internal helper namespace.
+
+## wscode helper
+
+`wscode <drive-letter> [path]` opens a directory in VS Code via `powershell.exe`. It converts the Unix path to a Windows path by replacing `/` with `\` and prepending the drive letter.
+
+### Common errors
+
+- `wscode` hangs or errors because `powershell.exe` is not on `$PATH`. This command is only meaningful inside WSL — it will fail on native Linux.
+- The path opened in VS Code is wrong because the drive letter mapping does not match the WSL distro root mounted in Windows.
+- `wscode Z` opens the current directory but the Windows path is incorrect because the current working directory contains a UNC prefix (e.g. `/mnt/c/...`). Use the appropriate drive letter that matches the actual Windows mount.
+
+### Fixes
+
+Verify `powershell.exe` is reachable:
+
+```bash
+which powershell.exe
+```
+
+Check the Windows drive letter mapped to your WSL distro root in Windows Explorer or via:
+
+```powershell
+# In PowerShell or CMD:
+net use
+```
+
+Call `wscode` with an explicit path to bypass any ambiguity:
+
+```bash
+wscode Z /home/vgoel/work/InsightAI
+```
 
 ## profile selection
 
