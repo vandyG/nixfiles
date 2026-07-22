@@ -74,6 +74,7 @@ in
     pkgs.nixfmt
     pkgs.nixd
     pkgs.mcp-nixos
+    pkgs.defuddle
   ];
 
   programs.gh = {
