@@ -6,3 +6,4 @@ result-*
 .direnv
 temp
 profiles/local.nix
+.envrc

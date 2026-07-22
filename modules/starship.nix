@@ -1,12 +1,12 @@
 { lib, ... }:
 
 let
-  themeName = "catppuccin_mocha";
+  catppuccinFlavour = "latte"; # one of: mocha | frappe | macchiato | latte
   themes = {
-    catppuccin_mocha = import ./starship-themes/catppuccin_mocha.nix;
+    catppuccin = import ./starship-themes/catppuccin.nix catppuccinFlavour;
     gruvbox_dark = import ./starship-themes/gruvbox_dark.nix;
   };
-  theme = themes.${themeName};
+  theme = themes.catppuccin;
   commonSettings = {
     os = {
       disabled = false;

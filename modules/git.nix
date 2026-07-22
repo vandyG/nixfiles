@@ -14,6 +14,12 @@ in
           name = "vandyG";
           email = "vandy.goel23@gmail.com";
         };
+
+        url = {
+          "git@github.com:" = {
+            insteadOf = "https://github.com/";
+          };
+        };
       }
       (lib.optionalAttrs sshKeyExists {
         gpg = {

@@ -11,6 +11,11 @@
       url = "github:nix-community/nix-vscode-extensions";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # --- Copilot agents & skills ---
+    obsidian-skills = {
+      url = "github:kepano/obsidian-skills";
+      flake = false;
     stylix = {
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -29,6 +34,8 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+
+      copilotSources = import ./modules/copilot/sources.nix { inherit obsidian-skills; };
 
       # Build a standalone Home Manager configuration for a named profile.
       mkHome =

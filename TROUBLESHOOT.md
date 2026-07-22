@@ -6,12 +6,42 @@ Table of contents
 - [git signing](#git-signing)
 - [firefox customizations](#firefox-customizations)
 - [nix-vandy helper](#nix-vandy-helper)
+- [wscode helper](#wscode-helper)
 - [profile selection](#profile-selection)
 - [wsl shell startup](#wsl-shell-startup)
 - [asusd service](#asusd-service)
 - [flake usage](#flake-usage)
 - [nixos profile](#nixos-profile)
 - [full efi partition](#full-efi-partition)
+- [windows terminal template](#windows-terminal-template)
+
+## copilot skills
+
+### Skills not appearing after `home-manager switch`
+
+The `programs.github-copilot-cli.skills` option writes skill entries to `~/.copilot/skills/` (or `$COPILOT_HOME/skills/`). If skills are missing:
+
+1. Confirm `~/.copilot/skills/` is not a stale symlink left over from the old `mkOutOfStoreSymlink` approach. If it is, the activation will fail with `mkdir: cannot create directory '~/.copilot/skills': File exists`. Remove the symlink and re-run:
+   ```bash
+   rm ~/.copilot/skills
+   home-manager switch --flake .#<profile>
+   ```
+2. Run `home-manager switch` again — HM manages the directory exclusively and will recreate it.
+
+### Local skill changes not picked up
+
+Local skills (`powerbi-modeling`, `powerbi-sql`) are copied into the Nix store at activation time. Edits to files under `modules/copilot/skills/` require a `home-manager switch` to take effect — unlike the old symlink approach, live edits are not reflected immediately.
+
+### External skill is outdated
+
+External skills are pinned in `flake.lock`. To pull upstream changes run:
+
+```bash
+nix flake update obsidian-skills
+home-manager switch --flake .#<profile>
+```
+
+---
 
 ## rclone mount
 
@@ -103,6 +133,48 @@ ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519
 
 After the key exists, re-apply Home Manager so Git picks up the signing settings.
 
+## git push asks for username/password
+
+GitHub HTTPS remotes are rewritten to SSH by default in [modules/git.nix](modules/git.nix), and `gh` is configured to clone over SSH as well.
+
+### Symptoms
+
+- `git push` asks for a GitHub username and password.
+- `gh repo clone` still uses `https://github.com/...`.
+
+### Fix
+
+Confirm the remote is a GitHub URL and re-open the shell so the rewritten Git config is active:
+
+```bash
+git remote -v
+```
+
+If the remote is already set to an HTTPS GitHub URL, Git should rewrite it automatically. If you prefer to make the change explicit for one repo, run:
+
+```bash
+git remote set-url origin git@github.com:OWNER/REPO.git
+```
+
+If you use more than one GitHub account, remember that SSH authentication keys are per account. In that case, keep the rewrite but add separate SSH auth keys and SSH host aliases for each account.
+
+### Per-project identity and signing (direnv)
+
+Use the `git_identity` direnv helper (defined in `modules/shells.nix`) inside a project's `.envrc` to override the committer identity and SSH-sign commits/tags for that project only:
+
+```bash
+git_identity "Vandy Goel" "vandy.goel@work.com" "$HOME/.ssh/work_ed25519.pub"
+```
+
+This exports `GIT_CONFIG_*` env vars (Git >= 2.31) that take precedence over the global config from `git.nix`. The third argument is optional and defaults to `~/.ssh/id_ed25519.pub`.
+
+#### Symptoms
+
+- Per-project name/email is not applied: run `direnv allow` and confirm `git config user.email` reports the expected value from inside the project directory.
+- Commits are signed with the wrong key: pass an explicit signing-key path as the third argument; without it the helper falls back to the global `~/.ssh/id_ed25519.pub`.
+- Commits sign locally but show "Unverified" on the git host: the public signing key must be registered as a **signing key** on the account whose verified email matches the committer email. `gh` auth stays on the personal account and does not affect this — registration is per git host.
+- GUI Git tools ignore the identity: the helper only applies inside the direnv-loaded shell. Launch the tool from a terminal where direnv is active, or set a repo-local `git config` instead.
+
 ## firefox customizations
 
 The full setup guide is in [docs/firefox.md](docs/firefox.md). This section covers the common failure modes.
@@ -174,6 +246,37 @@ If Fish is not showing completions for `nix-vandy`, re-apply Home Manager and st
 
 The custom Fish helper functions for `nix-vandy` intentionally avoid the `__fish_*` prefix so they do not collide with Fish's internal helper namespace.
 
+## wscode helper
+
+`wscode <drive-letter> [path]` opens a directory in VS Code via `powershell.exe`. It converts the Unix path to a Windows path by replacing `/` with `\` and prepending the drive letter.
+
+### Common errors
+
+- `wscode` hangs or errors because `powershell.exe` is not on `$PATH`. This command is only meaningful inside WSL — it will fail on native Linux.
+- The path opened in VS Code is wrong because the drive letter mapping does not match the WSL distro root mounted in Windows.
+- `wscode Z` opens the current directory but the Windows path is incorrect because the current working directory contains a UNC prefix (e.g. `/mnt/c/...`). Use the appropriate drive letter that matches the actual Windows mount.
+
+### Fixes
+
+Verify `powershell.exe` is reachable:
+
+```bash
+which powershell.exe
+```
+
+Check the Windows drive letter mapped to your WSL distro root in Windows Explorer or via:
+
+```powershell
+# In PowerShell or CMD:
+net use
+```
+
+Call `wscode` with an explicit path to bypass any ambiguity:
+
+```bash
+wscode Z /home/vgoel/work/InsightAI
+```
+
 ## profile selection
 
 The repo now selects platform-specific configuration through a profile instead of permanent Git branches.
@@ -196,6 +299,25 @@ Or create an untracked `profiles/local.nix` file in the repo so each machine kee
 ```nix
 "wsl_work"
 ```
+
+## home-manager user mismatch
+
+### Symptoms
+
+- Home Manager activation fails with `USER is "<current-user>", expected "<configured-user>"`.
+- The selected profile is correct, but the config is being applied from the wrong Linux account.
+
+### Fix
+
+Use the profile that matches the account you are logged into. In this repo, `wsl_work` is wired to the `vgoel` account and the other profiles are wired to `vandy`.
+
+If you are on the `vgoel` account, apply the WSL work profile:
+
+```bash
+home-manager switch --flake .#vandy-wsl_work
+```
+
+If you want the profile to work for a different account, update `home.username` and `home.homeDirectory` in [home.nix](home.nix) to match that account.
 
 The pre-migration branch state is recoverable from these local backup tags:
 
@@ -221,6 +343,24 @@ Set the terminal app to launch fish directly if you want fish on startup. Alacri
 If you want the old behavior back inside WSL itself, uncomment the `programs.bash` stanza in `profiles/base-wsl.nix` and re-apply Home Manager so bash can hand off to fish again.
 
 If you prefer keeping it disabled, leave bash as the WSL default and rely on the terminal app profile to start fish.
+
+## windows terminal template
+
+Windows Terminal appearance settings are split between the machine-specific [modules/templates/windows-terminal/settings.json](modules/templates/windows-terminal/settings.json) file and the shared [modules/templates/windows-terminal/appearance.json](modules/templates/windows-terminal/appearance.json) fragment.
+
+### Symptoms
+
+- Catppuccin schemes or themes are missing after copying the template.
+- Windows Terminal reports that it cannot load the imported appearance fragment.
+- The profile list looks wrong on a new machine, but the shared colors still match.
+
+### Fix
+
+Keep both files together so the relative `import` path in [modules/templates/windows-terminal/settings.json](modules/templates/windows-terminal/settings.json) still resolves to [modules/templates/windows-terminal/appearance.json](modules/templates/windows-terminal/appearance.json).
+
+If the profiles differ on a machine, edit only the profile list and GUIDs in [modules/templates/windows-terminal/settings.json](modules/templates/windows-terminal/settings.json); the shared fragment is meant to stay unchanged.
+
+If you are on an older Windows Terminal build, make sure it supports preview themes before assuming the fragment import failed.
 
 ## asusd service
 

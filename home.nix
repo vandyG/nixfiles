@@ -30,11 +30,32 @@ let
   };
   profileModule =
     profileModules.${selectedProfile} or (throw "nixfiles: unsupported profile '${selectedProfile}'");
+  homeIdentity = {
+    nixos = {
+      username = "vandy";
+      homeDirectory = "/home/vandy";
+    };
+
+    ubuntu = {
+      username = "vandy";
+      homeDirectory = "/home/vandy";
+    };
+
+    wsl = {
+      username = "vandy";
+      homeDirectory = "/home/vandy";
+    };
+
+    wsl_work = {
+      username = "vgoel";
+      homeDirectory = "/home/vgoel";
+    };
+  }.${selectedProfile};
 in
 
 {
-  home.username = "vandy";
-  home.homeDirectory = "/home/vandy";
+  home.username = homeIdentity.username;
+  home.homeDirectory = homeIdentity.homeDirectory;
   programs.home-manager.enable = true;
 
   nixpkgs.config = {
@@ -53,7 +74,13 @@ in
     pkgs.nixfmt
     pkgs.nixd
     pkgs.mcp-nixos
+    pkgs.defuddle
   ];
+
+  programs.gh = {
+    enable = true;
+    settings.git_protocol = "ssh";
+  };
 
   home.sessionVariables = {
     EDITOR = "code";
