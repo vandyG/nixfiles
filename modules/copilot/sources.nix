@@ -24,4 +24,12 @@
     obsidian-cli     = "${obsidian-skills}/skills/obsidian-cli";
     obsidian-markdown = "${obsidian-skills}/skills/obsidian-markdown";
   };
+
+  # -------------------------------------------------------------------------
+  # Instructions
+  # Add entries as: name = "${some-input}/instructions/name.instructions.md";
+  # -------------------------------------------------------------------------
+  instructions = { 
+    conventional-commits = ./instructions/conventional-commits.instructions.md;
+  };
 }

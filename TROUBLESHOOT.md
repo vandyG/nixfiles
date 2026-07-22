@@ -2,6 +2,7 @@
 
 Table of contents
 
+- [copilot skills and instructions](#copilot-skills-and-instructions)
 - [rclone mount](#rclone-mount)
 - [git signing](#git-signing)
 - [firefox customizations](#firefox-customizations)
@@ -16,7 +17,7 @@ Table of contents
 - [full efi partition](#full-efi-partition)
 - [windows terminal template](#windows-terminal-template)
 
-## copilot skills
+## copilot skills and instructions
 
 ### Skills not appearing after `home-manager switch`
 
@@ -41,6 +42,33 @@ External skills are pinned in `flake.lock`. To pull upstream changes run:
 nix flake update obsidian-skills
 home-manager switch --flake .#<profile>
 ```
+
+### Instruction files not appearing under Copilot config
+
+`modules/copilot/sources.nix` now drives instruction deployment. Every entry under `copilotSources.instructions` is linked to:
+
+`<programs.github-copilot-cli.configDir>/instructions/<name>.instructions.md`
+
+If files are missing:
+
+1. Confirm the source path exists and uses the `.instructions.md` filename pattern.
+2. Re-run Home Manager so the links are regenerated:
+	```bash
+	home-manager switch --flake .#<profile>
+	```
+3. Check where Copilot is reading config from (default is `~/.config/copilot` unless `programs.github-copilot-cli.configDir` is overridden).
+
+### Home Manager assertion fails for Copilot `configDir`
+
+This repository links instructions through `home.file`, which requires targets under `$HOME`.
+
+Symptom:
+
+- `home-manager switch` fails with an assertion mentioning `programs.github-copilot-cli.configDir must be inside $HOME`.
+
+Fix:
+
+- Set `programs.github-copilot-cli.configDir` to a path under your home directory (for example, `~/.config/copilot`), then apply again.
 
 ---
 
