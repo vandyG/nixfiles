@@ -8,6 +8,7 @@ Table of contents
 - [nix-vandy helper](#nix-vandy-helper)
 - [wscode helper](#wscode-helper)
 - [profile selection](#profile-selection)
+- [zscaler certificate file](#zscaler-certificate-file)
 - [wsl shell startup](#wsl-shell-startup)
 - [asusd service](#asusd-service)
 - [flake usage](#flake-usage)
@@ -299,6 +300,27 @@ Or create an untracked `profiles/local.nix` file in the repo so each machine kee
 ```nix
 "wsl_work"
 ```
+
+## zscaler certificate file
+
+The `wsl_work` profile expects a Zscaler root CA certificate at `/mnt/c/Users/vgoel/Downloads/cert.cer` and uses it for both `NODE_EXTRA_CA_CERTS` and `NIX_SSL_CERT_FILE`.
+
+### Symptoms
+
+- `nix`, `home-manager`, or `node` fail with TLS / certificate validation errors behind the corporate proxy.
+- The profile applies, but HTTPS downloads still report an unknown issuer or certificate chain failure.
+
+### Fix
+
+Export the Zscaler root CA certificate from Windows and save it at the exact path the profile expects:
+
+1. Open `certmgr.msc` on Windows.
+2. Go to `Trusted Root Certification Authorities` > `Certificates`.
+3. Find the Zscaler root CA that is installed for your machine.
+4. Export it as a `Base-64 encoded X.509 (.CER)` file.
+5. Save the export to `C:\Users\vgoel\Downloads\cert.cer`.
+
+If you keep the certificate somewhere else, update both [profiles/wsl_work.nix](profiles/wsl_work.nix) session variables to point at the new path. The file must be PEM/Base-64 encoded so Node and Nix can read it.
 
 ## home-manager user mismatch
 
