@@ -7,6 +7,8 @@
     ../modules/appearance.nix
     ../modules/vscode.nix
     ../modules/firefox.nix
+    ../modules/ghostty.nix
+    ../modules/stylix.nix
   ];
 
   # targets.genericLinux.enable is intentionally NOT set here.
@@ -17,5 +19,8 @@
     pkgs.gtk-engine-murrine
     pkgs.sassc
     pkgs.gnome-themes-extra
+    pkgs.stremio-linux-shell
+    pkgs.gnomeExtensions.rounded-window-corners-reborn   
+    pkgs.gnomeExtensions.hide-topbar
   ];
 }

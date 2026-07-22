@@ -2,21 +2,32 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, self, ... }:
+{
+  config,
+  pkgs,
+  self,
+  ...
+}:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ./hardware/asus.nix
-      ./hardware/nvidia.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ./hardware/asus.nix
+    ./hardware/nvidia.nix
+    ./steam.nix
+  ];
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.limine.enable = true;
+  boot.loader.limine.secureBoot.enable = true;
+  boot.loader.limine.style.wallpapers = [ ../../modules/templates/minimalist-black-hole.png ];
+  # boot.loader.systemd-boot.enable = true;
   # Shared ESP is very small on this triple-boot machine.
   boot.loader.systemd-boot.configurationLimit = 1;
   boot.loader.efi.canTouchEfiVariables = true;
+
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "vandy"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -85,9 +96,12 @@
   users.users.vandy = {
     isNormalUser = true;
     description = "Vandit Goel";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     packages = with pkgs; [
-    #  thunderbird
+      #  thunderbird
     ];
   };
 
@@ -103,11 +117,10 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #  wget
+    sbctl
   ];
-
-  programs.steam.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -140,5 +153,5 @@
   system.configurationRevision = self.rev or self.dirtyShortRev or "dirty";
 
   system.stateVersion = "25.11"; # Did you read the comment?
-  
+
 }

@@ -16,11 +16,21 @@
     obsidian-skills = {
       url = "github:kepano/obsidian-skills";
       flake = false;
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs =
-    { self, nixpkgs, home-manager, nix-vscode-extensions, obsidian-skills, ... }:
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      nix-vscode-extensions,
+      stylix,
+      ...
+    }:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
@@ -32,8 +42,11 @@
         profile:
         home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          extraSpecialArgs = { inherit profile nix-vscode-extensions copilotSources; };
-          modules = [ ./home.nix ];
+          extraSpecialArgs = { inherit profile nix-vscode-extensions; };
+          modules = [ 
+            ./home.nix 
+            stylix.homeModules.stylix
+          ];
         };
     in
     {

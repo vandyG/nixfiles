@@ -1,5 +1,5 @@
 # hardware/nvidia.nix
-{ config, pkgs, ... }:
+{ ... }:
 
 {
   hardware.graphics.enable = true;
@@ -15,6 +15,8 @@
     modesetting.enable = true;
 
     nvidiaSettings = true;
+
+    powerManagement.enable = true;
 
     prime = {
       # offload = {
