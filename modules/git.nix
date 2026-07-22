@@ -20,6 +20,11 @@ in
             insteadOf = "https://github.com/";
           };
         };
+
+        core = {
+          editor = "code --wait";
+          pager = "delta";
+        };
       }
       (lib.optionalAttrs sshKeyExists {
         gpg = {
@@ -32,5 +37,10 @@ in
           gpgsign = true;
         };
       });
+  };
+
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
   };
 }
