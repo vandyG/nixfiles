@@ -1,5 +1,6 @@
 # Old generation cleanup
 nix-env --list-generations
+sudo nixos-rebuild list-generations
 
 nix-collect-garbage  --delete-old
 
