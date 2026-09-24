@@ -14,8 +14,8 @@
   # -------------------------------------------------------------------------
   skills = {
     # Local skills
-    powerbi-modeling = ./skills/powerbi-modeling;
-    powerbi-sql      = ./skills/powerbi-sql;
+    # powerbi-modeling = ./skills/powerbi-modeling;
+    # powerbi-sql      = ./skills/powerbi-sql;
 
     # kepano/obsidian-skills
     defuddle         = "${obsidian-skills}/skills/defuddle";
