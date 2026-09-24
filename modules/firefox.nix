@@ -16,6 +16,20 @@
           }
         ];
       };
+
+      "SanitizeOnShutdown" = {
+        "Cache" = true;
+        "Cookies" = true;
+        "Sessions" = true;
+        "Exceptions" = [
+          "https://www.google.com"
+          "https://www.youtube.com"
+          "https://www.reddit.com"
+          "https://www.github.com"
+          "https://mail.google.com"
+          "https://music.youtube.com"
+        ];
+      };
     };
     profiles = {
       default = {
