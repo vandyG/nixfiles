@@ -13,9 +13,7 @@
     open = true;
 
     modesetting.enable = true;
-
     nvidiaSettings = true;
-
     powerManagement.enable = true;
 
     prime = {
@@ -26,8 +24,8 @@
 
       sync.enable = true;
 
-      amdgpuBusId = "PCI:101:0:0";
-      nvidiaBusId = "PCI:1:0:0";
+      amdgpuBusId = "PCI:101@0:0:0";
+      nvidiaBusId = "PCI:1@0:0:0";
     };
   };
 }

@@ -3,6 +3,7 @@
 
 {
   services.asusd.enable = true;
+  services.cardwired.enable = true; 
   # services.asusd.enableUserService = true;
 
   # services.supergfxd.enable = true;
