@@ -4,6 +4,7 @@
 {
   services.asusd.enable = true;
   services.cardwired.enable = true; 
+  services.cardwired.settings.external_display_auto_switch = true;
   # services.asusd.enableUserService = true;
 
   # services.supergfxd.enable = true;

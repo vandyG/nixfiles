@@ -1,0 +1,1 @@
+gamescope -W 2880 -H 1800 -r 120 -f --force-grab-cursor --adaptive-sync --hdr-enabled --hdr-debug-force-output --mangoapp -- %command%
