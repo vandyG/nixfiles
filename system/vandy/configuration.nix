@@ -129,6 +129,29 @@
     package = pkgs.valent;
   };
 
+  programs.nix-ld = {
+    enable = true;
+  };
+
+  services.openssh = {
+    enable = true;
+    openFirewall = false;
+    listenAddresses = [
+      {
+        addr = "192.168.1.165";
+        port = 22;
+      }
+    ];
+    settings = {
+      PasswordAuthentication = false;
+      PermitRootLogin = "no";
+    };
+  };
+
+  users.users.vandy.openssh.authorizedKeys.keys = [ 
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDnTp+v7kjcx07xcHGwSzgUYuTR4z5HHzWbL0jpeZcMU isn\vgoel@ISN-9M41QM4"
+   ];
+
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -145,6 +168,7 @@
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
+  networking.firewall.interfaces."wlp3s0".allowedTCPPorts = [ 22 ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 

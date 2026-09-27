@@ -100,6 +100,11 @@ How to use
 
 8. Keep secrets and external configs (like `rclone.conf`) out of this repo.
 
+LAN SSH to vandy
+- `system/vandy/configuration.nix` enables key-only SSH for `vandy` on `192.168.1.165:22`, with the firewall opening port 22 only on `wlp3s0`. No router port forwarding is needed.
+- From Windows PowerShell, connect with `ssh -i "$env:USERPROFILE\.ssh\id_ed25519_nixos" -o IdentitiesOnly=yes vandy@192.168.1.165` after applying `sudo nixos-rebuild switch --flake .#vandy` on NixOS.
+- Reserve `192.168.1.165` for vandy in the router's DHCP settings; if its address or interface changes, update the NixOS SSH listener/firewall configuration locally before reconnecting. See `TROUBLESHOOT.md` for connectivity checks.
+
 Notes and troubleshooting
 - See `TROUBLESHOOT.md` for common issues when applying this configuration.
 

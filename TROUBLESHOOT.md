@@ -14,6 +14,7 @@ Table of contents
 - [asusd service](#asusd-service)
 - [flake usage](#flake-usage)
 - [nixos profile](#nixos-profile)
+- [vandy lan ssh](#vandy-lan-ssh)
 - [full efi partition](#full-efi-partition)
 - [windows terminal template](#windows-terminal-template)
 
@@ -545,7 +546,7 @@ The `nixos` profile (`profiles/nixos.nix`) allows using this repo on a NixOS mac
 ### How it differs from ubuntu/wsl
 
 - `targets.genericLinux.enable` is intentionally **not set** on the `nixos` profile. NixOS manages `XDG_DATA_DIRS`, fontconfig, and locale natively via the system environment. Setting it to `true` on NixOS would conflict with the system's own setup.
-- System-level configuration (kernel, services, networking, hardware, users) is managed in `/etc/nixos/configuration.nix` (or a system flake), which is **separate from this repo**. This repo manages the user layer only.
+- System-level configuration for vandy (kernel, services, networking, hardware, users) is managed by `system/vandy/configuration.nix` via the `.#vandy` system flake; Home Manager manages the user layer separately.
 
 ### Applying on NixOS
 
@@ -594,6 +595,12 @@ If you accidentally apply a profile that has `targets.genericLinux.enable = true
 #### Fix
 
 Ensure `profiles/local.nix` returns `"nixos"` (not `"ubuntu"`) and re-apply Home Manager.
+
+## vandy lan ssh
+
+On Windows, check reachability with `Test-NetConnection 192.168.1.165 -Port 22`. On NixOS, check `sudo systemctl status sshd` and confirm that `ip -br -4 addr` still shows `192.168.1.165` on `wlp3s0`. The SSH listener is bound to that address and the firewall rule is scoped to that interface, so an address or interface change requires updating `system/vandy/configuration.nix` locally and rebuilding. Reserve the address in your router's DHCP settings to avoid unexpected changes.
+
+If the port test fails while SSH is running and both devices can otherwise reach the same LAN, check for Wi-Fi client isolation or a Zscaler/managed-Windows policy blocking local-subnet connections. Request an approved local-LAN exception from IT if needed; do not forward port 22 on the router. Password login is disabled, so connect using the Windows private key at `%USERPROFILE%\.ssh\id_ed25519_nixos`.
 
 ## full efi partition
 
