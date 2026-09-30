@@ -30,6 +30,7 @@
     pkgs.openssl
     pkgs.ente-cli
     pkgs.signal-desktop
+    pkgs.gnomeExtensions.caffeine
   ];
 
   dconf.settings = {

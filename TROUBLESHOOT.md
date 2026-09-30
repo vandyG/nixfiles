@@ -12,6 +12,7 @@ Table of contents
 - [zscaler certificate file](#zscaler-certificate-file)
 - [wsl shell startup](#wsl-shell-startup)
 - [asusd service](#asusd-service)
+- [zenscreen dp alt mode](#zenscreen-dp-alt-mode)
 - [flake usage](#flake-usage)
 - [nixos profile](#nixos-profile)
 - [vandy lan ssh](#vandy-lan-ssh)
@@ -440,6 +441,43 @@ sudo systemctl restart asusd
 ```
 
 The `ExecStartPre` `sleep` line in the unit is not the real problem here. It is just where systemd reports the sandbox failure after `/etc/asusd` is missing.
+
+## zenscreen dp alt mode
+
+### Symptoms
+
+- The ASUS ZenScreen MB16ACV shows `Your device does not support DP Alt Mode, please install the latest driver and try again.`
+- `lsusb` / kernel log shows `MB16ACV` (vendor `17e9`, DisplayLink) plus a Realtek `BillBoard Device` on a USB 2.0 hub.
+- No new connector turns `connected` under `/sys/class/drm/*/status`.
+- `/sys/class/typec/port*-partner/supports_usb_power_delivery` is `no` and the port has no DisplayPort (`ff01`) alt mode.
+
+### Cause
+
+DP Alt Mode was never negotiated (the Billboard device is what USB-C exposes when alt mode fails), so the monitor falls back to its DisplayLink USB graphics chip, which needs a host driver. This is not caused by `asus.nix`, Cardwire (`cardwire get` reports `Hybrid`, nothing blocked) or NVIDIA runtime power management; forcing the dGPU on and trying both USB-C ports does not help.
+
+An occasional `ucsi_acpi USBC000:00: error -ETIMEDOUT: PPM init failed` at boot only hides `/sys/class/typec` for that boot; it is not the root cause.
+
+### Fix
+
+[system/vandy/configuration.nix](system/vandy/configuration.nix) enables the `displaylink` video driver (DisplayLink Manager + `evdi` kernel module). The driver is unfree and must be added to the Nix store manually after accepting the EULA at https://www.synaptics.com/products/displaylink-usb-graphics-software-ubuntu-62:
+
+```bash
+mv ~/Downloads/"DisplayLink USB Graphics Software for Ubuntu6.2-EXE.zip" ~/Downloads/displaylink-620.zip
+nix-prefetch-url file://$HOME/Downloads/displaylink-620.zip
+sudo nixos-rebuild switch --flake .#vandy
+```
+
+Reboot (so `evdi` loads), then replug the monitor and check:
+
+```bash
+systemctl status dlm.service
+lsmod | grep evdi
+grep -H . /sys/class/drm/card*-DVI-I-*/status
+```
+
+If nixpkgs bumps the DisplayLink version, the rebuild fails with a `requireFile` message naming the new zip; repeat the download with that name.
+
+To use real DP Alt Mode instead, test the monitor on Windows or another machine with the bundled USB-C cable; if it works there, try a BIOS update and a different full-featured USB-C (DP-capable) cable on Linux.
 
 ## mcp-nixos server not found in VS Code WSL
 

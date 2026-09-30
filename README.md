@@ -105,6 +105,10 @@ LAN SSH to vandy
 - From Windows PowerShell, connect with `ssh -i "$env:USERPROFILE\.ssh\id_ed25519_nixos" -o IdentitiesOnly=yes vandy@192.168.1.165` after applying `sudo nixos-rebuild switch --flake .#vandy` on NixOS.
 - Reserve `192.168.1.165` for vandy in the router's DHCP settings; if its address or interface changes, update the NixOS SSH listener/firewall configuration locally before reconnecting. See `TROUBLESHOOT.md` for connectivity checks.
 
+External USB-C monitor on vandy
+- `system/vandy/configuration.nix` adds the `displaylink` video driver (DisplayLink + `evdi`) so the ASUS ZenScreen MB16ACV works over USB when DP Alt Mode is not negotiated.
+- The unfree driver zip must be added to the Nix store before `sudo nixos-rebuild switch --flake .#vandy`; see `TROUBLESHOOT.md` (zenscreen dp alt mode).
+
 Notes and troubleshooting
 - See `TROUBLESHOOT.md` for common issues when applying this configuration.
 

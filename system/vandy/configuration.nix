@@ -138,7 +138,7 @@
     openFirewall = false;
     listenAddresses = [
       {
-        addr = "192.168.1.165";
+        addr = "0.0.0.0";
         port = 22;
       }
     ];
