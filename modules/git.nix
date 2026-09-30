@@ -1,42 +1,41 @@
 { config, pkgs, lib, ... }:
 
 let
-  sshKey = "${builtins.getEnv "HOME"}/.ssh/id_ed25519.pub";
-  sshKeyExists = builtins.pathExists sshKey;
+  # NOTE: builtins.pathExists/getEnv are impure and always resolve to false
+  # under flake (pure) evaluation, so the signing key path must not be
+  # conditioned on a filesystem check at build time.
+  sshKey = "${config.home.homeDirectory}/.ssh/id_ed25519.pub";
 in
 
 {
   programs.git = {
     enable = true;
-    settings = lib.recursiveUpdate
-      {
-        user = {
-          name = "vandyG";
-          email = "vandy.goel23@gmail.com";
-        };
+    settings = {
+      user = {
+        name = "vandyG";
+        email = "vandy.goel23@gmail.com";
+        signingKey = sshKey;
+      };
 
-        url = {
-          "git@github.com:" = {
-            insteadOf = "https://github.com/";
-          };
+      url = {
+        "git@github.com:" = {
+          insteadOf = "https://github.com/";
         };
+      };
 
-        core = {
-          editor = "code --wait";
-          pager = "delta";
-        };
-      }
-      (lib.optionalAttrs sshKeyExists {
-        gpg = {
-          format = "ssh";
-        };
-        user = {
-          signingKey = sshKey;
-        };
-        commit = {
-          gpgsign = true;
-        };
-      });
+      core = {
+        editor = "code --wait";
+        pager = "delta";
+      };
+
+      gpg = {
+        format = "ssh";
+      };
+
+      commit = {
+        gpgsign = true;
+      };
+    };
   };
 
   programs.delta = {

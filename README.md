@@ -96,7 +96,7 @@ How to use
 
 6. Run `nix-vandy syncbranches` only if you still need to maintain the previous branch-based workflow during the transition.
 
-7. If `~/.ssh/id_ed25519.pub` exists, the Git module automatically enables SSH-format commit signing and uses that public key as the signing key.
+7. The Git module always enables SSH-format commit signing, pointing at `~/.ssh/id_ed25519.pub` as the signing key. Make sure that key pair exists before committing (see `TROUBLESHOOT.md`).
 
 8. Keep secrets and external configs (like `rclone.conf`) out of this repo.
 

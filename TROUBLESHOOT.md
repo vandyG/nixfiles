@@ -147,22 +147,25 @@ rclone lsd vandy23:
 
 ## git signing
 
-The Git module enables SSH-format commit signing only when `~/.ssh/id_ed25519.pub` exists.
+The Git module always sets `gpg.format = ssh`, `commit.gpgsign = true`, and `user.signingKey = ~/.ssh/id_ed25519.pub` — signing is unconditional, not gated on a filesystem check.
+
+**Do not** reintroduce a `builtins.pathExists`/`builtins.getEnv "HOME"` guard here. `home-manager switch --flake .#<profile>` evaluates purely, so `builtins.getEnv` returns `""` and `builtins.pathExists` returns `false` for any real host path even when the file exists (verify with `nix eval --expr 'builtins.pathExists /etc/passwd'` vs. the same with `--impure`). A guard like that silently disables signing on every flake-based rebuild while looking correct in isolation. Use `config.home.homeDirectory` for the path instead of `builtins.getEnv`.
 
 ### Symptoms
 
 - Commits are not signed even though Home Manager has been applied.
+- `git config --list` shows no `gpg.*`, `commit.gpgsign`, or `user.signingkey` entries.
 - Git errors that the SSH signing key cannot be found.
 
 ### Fix
 
-Create the expected SSH key pair or adjust the module to point at the public key you actually use:
+Create the expected SSH key pair if it doesn't exist yet:
 
 ```bash
 ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519
 ```
 
-After the key exists, re-apply Home Manager so Git picks up the signing settings.
+Then re-apply Home Manager so Git picks up the signing settings. To also verify signatures locally with `git log --show-signature`, set `gpg.ssh.allowedSignersFile` to a file containing `<email> <contents of id_ed25519.pub>` (not required for GitHub's own signature verification, which uses the key you upload there).
 
 ## git push asks for username/password
 
